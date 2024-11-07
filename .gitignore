@@ -1,0 +1,17 @@
+libtorch*
+build
+gotorch
+libcgotorch.so
+*~
+.vscode
+data
+*.test
+.DS_store
+*.png
+*.pt
+trace.out
+*.log
+*.o
+*.backup
+*.backup
+linux/libtorch/
