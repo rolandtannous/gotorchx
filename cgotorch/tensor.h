@@ -31,6 +31,8 @@ const char *Tensor_CopyTo(Tensor input, Device device, Tensor *output);
 const char *Tensor_PinMemory(Tensor input, Tensor *output);
 const char *Tensor_CUDA(Tensor input, Device device, int8_t non_blocking,
                         Tensor *output);
+// Add with other tensor declarations
+const char *Tensor_IsPinned(Tensor tensor, bool *result);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Backward, Gradient
@@ -49,6 +51,9 @@ const char *ItemFloat64(Tensor a, double *result);
 
 const char *Tensor_Index(Tensor a, int64_t *index, int64_t index_len,
                          Tensor *result);
+
+// Add this with the other tensor operations
+const char *Triu(Tensor input, int64_t diagonal, Tensor *result);
 
 #ifdef __cplusplus
 }

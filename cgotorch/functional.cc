@@ -245,11 +245,14 @@ const char *MultiHeadAttention(Tensor query, Tensor key, Tensor value,
         auto attn_weights = torch::matmul(q_4d, k_4d.transpose(-2, -1)) * scaling;
 
         // Apply mask if provided
+        // In the MultiHeadAttention function, update the mask handling:
         if (mask) {
             auto mask_tensor = *static_cast<torch::Tensor*>(mask);
-            attn_weights = attn_weights.masked_fill(mask_tensor, -std::numeric_limits<float>::infinity());
+            TORCH_CHECK(mask_tensor.scalar_type() == torch::kBool,
+                "mask must be a boolean tensor");
+            attn_weights = attn_weights.masked_fill(mask_tensor,
+                -std::numeric_limits<float>::infinity());
         }
-
         attn_weights = torch::softmax(attn_weights, -1);
 
         // Apply dropout if provided

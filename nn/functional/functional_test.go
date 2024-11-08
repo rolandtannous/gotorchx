@@ -96,12 +96,22 @@ func TestFunctionalAdaptiveAvgPool2d(t *testing.T) {
 // >>> loss = F.binary_cross_entropy(torch.sigmoid(input), target)
 // >>> print(loss)
 // tensor(-5.7473)
+//
+//	func TestFunctionalBinaryCrossEntropy(t *testing.T) {
+//		input := torch.NewTensor([][]float64{{1, 2}, {3, 4}, {5, 6}})
+//		target := torch.NewTensor([][]float64{{6, 5}, {4, 3}, {2, 1}})
+//		var weight torch.Tensor
+//		loss := BinaryCrossEntropy(torch.Sigmoid(input), target, weight, "mean")
+//		assert.Equal(t, "-5.74731\n[ CPUDoubleType{} ]", loss.String())
+//	}
 func TestFunctionalBinaryCrossEntropy(t *testing.T) {
 	input := torch.NewTensor([][]float64{{1, 2}, {3, 4}, {5, 6}})
-	target := torch.NewTensor([][]float64{{6, 5}, {4, 3}, {2, 1}})
+	target := torch.NewTensor([][]float64{{1, 0}, {0, 1}, {1, 0}})
 	var weight torch.Tensor
 	loss := BinaryCrossEntropy(torch.Sigmoid(input), target, weight, "mean")
-	assert.Equal(t, "-5.74731\n[ CPUDoubleType{} ]", loss.String())
+
+	lossValue := loss.Item().(float64)
+	assert.InDelta(t, 1.9194, lossValue, 1e-3)
 }
 
 // >>> import torch

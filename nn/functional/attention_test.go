@@ -35,3 +35,119 @@ func TestMultiHeadAttention(t *testing.T) {
 	// Verify output is not nil and contains valid values
 	assert.NotNil(t, output.T)
 }
+
+func TestMultiHeadAttentionWithMasks(t *testing.T) {
+	seqLen := int64(4)
+	batchSize := int64(2)
+	embedDim := int64(8)
+	numHeads := int64(2)
+
+	query := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	key := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	value := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+
+	t.Run("with_causal_mask", func(t *testing.T) {
+		// Create a causal mask - we need it to be boolean type
+		// First create a full mask of ones
+		mask := torch.Full([]int64{batchSize, numHeads, seqLen, seqLen}, 1, false)
+		mask = mask.Triu(1)
+		// Convert to boolean by comparing with 1
+		mask = mask.Eq(torch.Full([]int64{1}, 1, false))
+
+		output := MultiHeadAttention(query, key, value, numHeads, mask, torch.Tensor{})
+
+		shape := output.Shape()
+		assert.Equal(t, seqLen, shape[0])
+		assert.Equal(t, batchSize, shape[1])
+		assert.Equal(t, embedDim, shape[2])
+	})
+}
+
+func TestMultiHeadAttentionWithDropout(t *testing.T) {
+	seqLen := int64(4)
+	batchSize := int64(2)
+	embedDim := int64(8)
+	numHeads := int64(2)
+
+	query := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	key := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	value := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+
+	// Create dropout probability tensor using Full
+	dropoutProb := torch.Full([]int64{1}, 0.5, false)
+
+	output := MultiHeadAttention(query, key, value, numHeads, torch.Tensor{}, dropoutProb)
+
+	shape := output.Shape()
+	assert.Equal(t, seqLen, shape[0])
+	assert.Equal(t, batchSize, shape[1])
+	assert.Equal(t, embedDim, shape[2])
+}
+
+func TestMultiHeadAttentionErrors(t *testing.T) {
+	t.Run("invalid_embed_dim", func(t *testing.T) {
+		seqLen := int64(4)
+		batchSize := int64(2)
+		embedDim := int64(7) // Not divisible by numHeads
+		numHeads := int64(2)
+
+		query := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+		key := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+		value := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+
+		assert.Panics(t, func() {
+			MultiHeadAttention(query, key, value, numHeads, torch.Tensor{}, torch.Tensor{})
+		})
+	})
+
+	t.Run("mismatched_dimensions", func(t *testing.T) {
+		query := torch.RandN([]int64{4, 2, 8}, false)
+		key := torch.RandN([]int64{5, 2, 8}, false) // Different sequence length
+		value := torch.RandN([]int64{4, 2, 8}, false)
+
+		assert.Panics(t, func() {
+			MultiHeadAttention(query, key, value, 2, torch.Tensor{}, torch.Tensor{})
+		})
+	})
+}
+
+func TestMultiHeadAttentionDevice(t *testing.T) {
+	// Skip if CUDA is not available
+	if !torch.IsCUDAAvailable() {
+		t.Skip("CUDA not available")
+	}
+
+	seqLen := int64(4)
+	batchSize := int64(2)
+	embedDim := int64(8)
+	numHeads := int64(2)
+
+	device := torch.NewDevice("cuda")
+
+	// Create tensors on CPU first
+	query := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	key := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+	value := torch.RandN([]int64{seqLen, batchSize, embedDim}, false)
+
+	// Move to GPU
+	queryGPU := query.CopyTo(device)
+	keyGPU := key.CopyTo(device)
+	valueGPU := value.CopyTo(device)
+
+	// Run on GPU
+	outputGPU := MultiHeadAttention(
+		queryGPU,
+		keyGPU,
+		valueGPU,
+		numHeads,
+		torch.Tensor{},
+		torch.Tensor{},
+	)
+
+	// Move back to CPU for comparison
+	outputGPUCPU := outputGPU.CopyTo(torch.NewDevice("cpu"))
+
+	// Compare with CPU result
+	outputCPU := MultiHeadAttention(query, key, value, numHeads, torch.Tensor{}, torch.Tensor{})
+	assert.True(t, torch.AllClose(outputGPUCPU, outputCPU))
+}

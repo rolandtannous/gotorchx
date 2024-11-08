@@ -211,3 +211,23 @@ const char *Tensor_Index(Tensor input, int64_t *index, int64_t index_len,
     return exception_str(e.what());
   }
 }
+
+const char *Triu(Tensor input, int64_t diagonal, Tensor *result) {
+    try {
+        auto output = torch::triu(*static_cast<torch::Tensor*>(input), diagonal);
+        *result = new torch::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Tensor_IsPinned(Tensor tensor, bool *result) {
+    try {
+        auto t = static_cast<torch::Tensor*>(tensor);
+        *result = t->is_pinned();
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

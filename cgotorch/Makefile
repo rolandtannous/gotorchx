@@ -10,7 +10,9 @@ objs := $(srcs:%.cc=%.o)
 	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
 	-fPIC  \
 	-D_GLIBCXX_USE_CXX11_ABI=$(GLIBCXX_USE_CXX11_ABI) \
+	$(CUDA_FLAGS) \
 	-O -c $< -o $@
+
 libcgotorch.so: $(objs) ${LIBTORCH_DIR}
 	${CXX} 	-L libtorch/lib \
 	$(objs) \
@@ -18,7 +20,7 @@ libcgotorch.so: $(objs) ${LIBTORCH_DIR}
 	-o $@ ${INSTALL_NAME} \
 	-Wl,-rpath,libtorch/lib \
 	-Wl,-${LOAD} libtorch/lib/libc10.${LIB_SUFFIX} \
-	-lc10 -ltorch -ltorch_cpu
+	-lc10 -ltorch -ltorch_cpu -ltorch_cuda -lc10_cuda
 
 clean:
 	rm -rf *.so *.o

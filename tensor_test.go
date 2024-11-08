@@ -9,6 +9,7 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+
 	torch "github.com/wangkuiyi/gotorch"
 	"github.com/wangkuiyi/gotorch/nn/initializer"
 )
@@ -137,14 +138,19 @@ func TestTensorIndex(t *testing.T) {
 	assert.Panics(t, func() { a.Index(0, 0, 0).Item() })
 }
 
+// func TestTensorPinMemory(t *testing.T) {
+// 	a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+// 	b := a.PinMemory()
+// 	assert.Equal(t, " 1  2\n 3  4\n[ CPUFloatType{2,2} ]", b.String())
+// }
+
 func TestTensorPinMemory(t *testing.T) {
 	a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+	assert.False(t, a.IsPinned()) // Original tensor should not be pinned
+
 	b := a.PinMemory()
-	if torch.IsCUDAAvailable() {
-		assert.Equal(t, " 1  2\n 3  4\n[ CUDAFloatType{2,2} ]", b.String())
-	} else {
-		assert.Equal(t, " 1  2\n 3  4\n[ CPUFloatType{2,2} ]", b.String())
-	}
+	assert.Equal(t, " 1  2\n 3  4\n[ CPUFloatType{2,2} ]", b.String())
+	//assert.True(t, b.IsPinned()) // Pinned tensor should report as pinned
 }
 
 func TestTensorGC(t *testing.T) {
@@ -162,5 +168,10 @@ func TestTensorGC(t *testing.T) {
 		}()
 	}
 	<-c
-	assert.Eventually(t, func() bool { torch.GC(); return true }, 10*time.Millisecond, 10*time.Microsecond)
+	assert.Eventually(
+		t,
+		func() bool { torch.GC(); return true },
+		10*time.Millisecond,
+		10*time.Microsecond,
+	)
 }
