@@ -1,6 +1,7 @@
 package functional
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -150,4 +151,40 @@ func TestMultiHeadAttentionDevice(t *testing.T) {
 	// Compare with CPU result
 	outputCPU := MultiHeadAttention(query, key, value, numHeads, torch.Tensor{}, torch.Tensor{})
 	assert.True(t, torch.AllClose(outputGPUCPU, outputCPU))
+}
+
+func TestFlashAttention(t *testing.T) {
+	if !torch.IsCUDAAvailable() {
+		t.Skip("CUDA not available")
+	}
+
+	batchSize := int64(2)
+	numHeads := int64(8)
+	seqLen := int64(128)
+	headDim := int64(64)
+
+	// Create base tensors
+	query := torch.RandN([]int64{batchSize, numHeads, seqLen, headDim}, false)
+	key := torch.RandN([]int64{batchSize, numHeads, seqLen, headDim}, false)
+	value := torch.RandN([]int64{batchSize, numHeads, seqLen, headDim}, false)
+
+	// Try both fp16 and bf16
+	dtypes := []int8{torch.Half, torch.BFloat16}
+	for _, dtype := range dtypes {
+		t.Run(fmt.Sprintf("dtype_%d", dtype), func(t *testing.T) {
+			// Convert to desired dtype and move to CUDA
+			device := torch.NewDevice("cuda")
+			q := query.CastTo(dtype).CopyTo(device)
+			k := key.CastTo(dtype).CopyTo(device)
+			v := value.CastTo(dtype).CopyTo(device)
+
+			// Test without causal mask
+			output := FlashAttention(q, k, v, 0.0, false)
+			assert.Equal(t, []int64{batchSize, numHeads, seqLen, headDim}, output.Shape())
+
+			// Test with causal mask
+			outputCausal := FlashAttention(q, k, v, 0.0, true)
+			assert.Equal(t, []int64{batchSize, numHeads, seqLen, headDim}, outputCausal.Shape())
+		})
+	}
 }

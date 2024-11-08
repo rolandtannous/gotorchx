@@ -273,3 +273,47 @@ const char *MultiHeadAttention(Tensor query, Tensor key, Tensor value,
         return exception_str(e.what());
     }
 }
+
+const char *FlashAttention(Tensor query, Tensor key, Tensor value,
+    double dropout_p, bool is_causal, Tensor *result) {
+    try {
+        auto q = static_cast<torch::Tensor*>(query);
+        auto k = static_cast<torch::Tensor*>(key);
+        auto v = static_cast<torch::Tensor*>(value);
+
+        // Check if we can use Flash Attention
+        TORCH_CHECK(q->device().is_cuda(), "Flash Attention requires CUDA tensors");
+        TORCH_CHECK(q->scalar_type() == torch::kFloat16 || q->scalar_type() == torch::kBFloat16,
+            "Flash Attention only supports fp16 or bf16 data types");
+
+        // Check dimensions - expect (B, H, S, D) format
+        TORCH_CHECK(q->dim() == 4, "query must be 4-dimensional (batch_size, num_heads, seq_len, head_dim)");
+        TORCH_CHECK(k->dim() == 4 && v->dim() == 4, "key and value must be 4-dimensional");
+
+        // Verify shapes match
+        TORCH_CHECK(k->size(0) == q->size(0) && v->size(0) == q->size(0), "batch sizes must match");
+        TORCH_CHECK(k->size(1) == q->size(1) && v->size(1) == q->size(1), "num_heads must match");
+        TORCH_CHECK(k->size(3) == q->size(3) && v->size(3) == q->size(3), "head_dim must match");
+        TORCH_CHECK(k->size(2) == v->size(2), "key and value sequence lengths must match");
+
+        // Verify tensors are contiguous
+        TORCH_CHECK(q->is_contiguous() && k->is_contiguous() && v->is_contiguous(),
+            "input tensors must be contiguous");
+
+        // Call Flash Attention
+        auto [output, logsumexp, cum_seq_q, cum_seq_k, max_q, max_k,
+              philox_seed, philox_offset, debug_mask] =
+            torch::_scaled_dot_product_flash_attention(
+                *q, *k, *v,
+                dropout_p,
+                is_causal,
+                false,  // return_debug_mask
+                std::nullopt  // scale
+            );
+
+        *result = new torch::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

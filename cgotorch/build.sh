@@ -109,9 +109,14 @@ if [[ "$OS" == "linux" ]]; then
     if version_ge "$CUDA_VERSION" "12.4"; then
         echo "Building for Linux with CUDA $CUDA_VERSION (>= 12.4)"
         LIBTORCH_DIR="linux/libtorch"
+        CUDA_ZIP="libtorch-cxx11-abi-shared-with-deps-2.5.1+cu124.zip"
         if [[ ! -d "$DIR/$LIBTORCH_DIR" ]]; then
+          if [[ ! -f "$DIR/$CUDA_ZIP" ]]; then
+            echo "Downloading CUDA 12.4 libtorch..."
             wget https://download.pytorch.org/libtorch/cu124/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcu124.zip
-            unzip -qq -o libtorch-cxx11-abi-shared-with-deps-2.5.1+cu124.zip -d linux
+          fi
+          echo "Extracting libtorch"
+          unzip -qq -o libtorch-cxx11-abi-shared-with-deps-2.5.1+cu124.zip -d linux
         fi
     elif [[ "$CUDA_VERSION" == "12.1" ]]; then
         echo "Building for Linux with CUDA 12.1"

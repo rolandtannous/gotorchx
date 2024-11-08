@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"unsafe"
 
+	"github.com/wangkuiyi/gotorch"
 	torch "github.com/wangkuiyi/gotorch"
 )
 
@@ -277,5 +278,19 @@ func MultiHeadAttention(query, key, value torch.Tensor, numHeads int64,
 
 	// Set finalizer and return
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
+}
+
+// FlashAttention performs multi-head attention using Flash Attention algorithm
+func FlashAttention(query, key, value torch.Tensor, dropoutP float64, isCausal bool) torch.Tensor {
+	var t C.Tensor
+	gotorch.MustNil(unsafe.Pointer(C.FlashAttention(
+		C.Tensor(*query.T),
+		C.Tensor(*key.T),
+		C.Tensor(*value.T),
+		C.double(dropoutP),
+		C.bool(isCausal),
+		&t)))
+	gotorch.SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
