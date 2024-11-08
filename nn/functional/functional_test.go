@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	torch "github.com/wangkuiyi/gotorch"
 )
 
@@ -69,7 +70,8 @@ func TestFunctionalNllLoss(t *testing.T) {
 
 // >>> torch.nn.functional.log_softmax(torch.tensor([[-0.5, -1.], [1., 0.5]]), dim=1)
 // tensor([[-0.4741, -0.9741],
-//         [-0.4741, -0.9741]])
+//
+//	[-0.4741, -0.9741]])
 func TestFunctionalLogSoftmax(t *testing.T) {
 	r := LogSoftmax(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}),
 		1)
@@ -132,7 +134,8 @@ func TestFunctionalLeakyRelu(t *testing.T) {
 // i>>> import torch.nn.functional as F
 // >>> F.linear(torch.tensor([[1.,2.],[3.,4.]]), torch.tensor([[1.,2.],[3.,4.]]), torch.tensor([1.,2.]))
 // tensor([[ 6., 13.],
-//         [12., 27.]])
+//
+//	[12., 27.]])
 func TestFunctionalLinear(t *testing.T) {
 	o := Linear(
 		torch.NewTensor([][]float64{{1, 2}, {3, 4}}),

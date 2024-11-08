@@ -7,3 +7,5 @@ require (
 	github.com/x448/float16 v0.8.4
 	gocv.io/x/gocv v0.24.0
 )
+
+replace github.com/wangkuiyi/gotorch => /home/mlengineer/gotorch

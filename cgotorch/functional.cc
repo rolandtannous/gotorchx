@@ -207,3 +207,66 @@ const char *AdaptiveAvgPool2d(Tensor input, int64_t *output_size_data,
     return exception_str(e.what());
   }
 }
+
+const char *MultiHeadAttention(Tensor query, Tensor key, Tensor value,
+    int64_t num_heads, Tensor mask, Tensor dropout, Tensor *result) {
+    try {
+        auto q = static_cast<torch::Tensor*>(query);
+        auto k = static_cast<torch::Tensor*>(key);
+        auto v = static_cast<torch::Tensor*>(value);
+
+        // Check dimensions - expect 3D inputs (S, N, E)
+        TORCH_CHECK(q->dim() == 3 && k->dim() == 3 && v->dim() == 3,
+            "query, key, value must be 3-dimensional (seq_len, batch, embed_dim)");
+
+        // Get dimensions
+        auto seq_len = q->size(0);
+        auto batch_size = q->size(1);
+        auto embed_dim = q->size(2);
+        auto head_dim = embed_dim / num_heads;
+
+        // Check shapes
+        TORCH_CHECK(k->size(2) == embed_dim && v->size(2) == embed_dim,
+            "key and value must have the same embed_dim as query");
+        TORCH_CHECK(k->size(0) == v->size(0),
+            "key and value must have the same sequence length");
+        TORCH_CHECK(embed_dim % num_heads == 0,
+            "embed_dim must be divisible by num_heads");
+
+        // Scale factor
+        float scaling = 1.0f / std::sqrt(static_cast<float>(head_dim));
+
+        // Reshape and transpose: (S, N, E) -> (N, H, S, D)
+        auto q_4d = q->reshape({seq_len, batch_size, num_heads, head_dim}).permute({1, 2, 0, 3});
+        auto k_4d = k->reshape({k->size(0), batch_size, num_heads, head_dim}).permute({1, 2, 0, 3});
+        auto v_4d = v->reshape({v->size(0), batch_size, num_heads, head_dim}).permute({1, 2, 0, 3});
+
+        // Scaled dot-product attention
+        auto attn_weights = torch::matmul(q_4d, k_4d.transpose(-2, -1)) * scaling;
+
+        // Apply mask if provided
+        if (mask) {
+            auto mask_tensor = *static_cast<torch::Tensor*>(mask);
+            attn_weights = attn_weights.masked_fill(mask_tensor, -std::numeric_limits<float>::infinity());
+        }
+
+        attn_weights = torch::softmax(attn_weights, -1);
+
+        // Apply dropout if provided
+        if (dropout) {
+            auto dropout_p = static_cast<torch::Tensor*>(dropout)->item<float>();
+            attn_weights = torch::dropout(attn_weights, dropout_p, true);
+        }
+
+        auto attn_output = torch::matmul(attn_weights, v_4d);
+
+        // Reshape back to (S, N, E)
+        attn_output = attn_output.permute({2, 0, 1, 3})
+                                .reshape({seq_len, batch_size, embed_dim});
+
+        *result = new torch::Tensor(attn_output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

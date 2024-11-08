@@ -4,14 +4,13 @@ srcs := $(wildcard *.cc)
 hdrs := $(wildcard *.h)
 objs := $(srcs:%.cc=%.o)
 
-%.o: %.cc %.h torchdef.h
-	${CXX} -std=c++14 \
-	-I .. -I libtorch/include \
-	-I libtorch/include/torch/csrc/api/include \
-	-fPIC ${CUDA_FLAGS} \
-	-D_GLIBCXX_USE_CXX11_ABI=${GLIBCXX_USE_CXX11_ABI} \
+%.o: %.cc
+	$(CXX) -std=c++17 \
+	-I .. -I $(LIBTORCH_DIR)/include \
+	-I $(LIBTORCH_DIR)/include/torch/csrc/api/include \
+	-fPIC  \
+	-D_GLIBCXX_USE_CXX11_ABI=$(GLIBCXX_USE_CXX11_ABI) \
 	-O -c $< -o $@
-
 libcgotorch.so: $(objs) ${LIBTORCH_DIR}
 	${CXX} 	-L libtorch/lib \
 	$(objs) \

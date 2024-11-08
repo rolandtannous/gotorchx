@@ -24,13 +24,29 @@ CUDA_FLAGS=""
 #     fi
 # }
 
+
 function build_linux_no_cuda() {
     CXX="clang++"
     LIBTORCH_DIR="linux/libtorch"
-    GLIBCXX_USE_CXX11_ABI="1"  # Changed to 1 for newer PyTorch
+    GLIBCXX_USE_CXX11_ABI="1"
     if [[ ! -d "$DIR/$LIBTORCH_DIR" ]]; then
-        curl -LsO 'https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcpu.zip'
+        echo "Downloading CPU libtorch 2.5.1..."
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-cxx11-abi-shared-with-deps-2.5.1%2Bcpu.zip
+
+        if [ $? -ne 0 ]; then
+            echo "Failed to download libtorch"
+            exit 1
+        fi
+
+        echo "Extracting libtorch..."
         unzip -qq -o libtorch-cxx11-abi-shared-with-deps-2.5.1+cpu.zip -d linux
+
+        if [ $? -ne 0 ]; then
+            echo "Failed to extract libtorch"
+            exit 1
+        fi
+
+        rm libtorch-cxx11-abi-shared-with-deps-2.5.1+cpu.zip
     fi
 }
 

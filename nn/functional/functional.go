@@ -5,7 +5,6 @@ package functional
 // #cgo LDFLAGS: -L ${SRCDIR}/../../cgotorch/libtorch/lib -Wl,-rpath ${SRCDIR}/../../cgotorch/libtorch/lib -lc10 -ltorch -ltorch_cpu
 // #include "cgotorch/cgotorch.h"
 import "C"
-
 import (
 	"runtime"
 	"unsafe"
@@ -46,7 +45,7 @@ func BatchNorm(input, runningMean, runningVar, weight, bias torch.Tensor,
 			&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // Conv2d does 2d-convolution
@@ -67,7 +66,7 @@ func Conv2d(input, weight, bias torch.Tensor,
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // ConvTranspose2d does 2d-fractionally-strided convolution
@@ -97,7 +96,7 @@ func ConvTranspose2d(
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // LogSoftmax torch.nn.functional.log_softmax
@@ -129,7 +128,7 @@ func NllLoss(input, target, weight torch.Tensor, ignoreIndex int64,
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // BinaryCrossEntropy torch.nn.functional.binary_cross_entropy
@@ -147,7 +146,7 @@ func BinaryCrossEntropy(input, target, weight torch.Tensor,
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // CrossEntropy torch.nn.functional.cross_entropy
@@ -166,7 +165,7 @@ func CrossEntropy(input, target, weight torch.Tensor, ignoreIndex int64,
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // Relu torch.nn.functional.relu
@@ -180,7 +179,7 @@ func Relu(input torch.Tensor, inplace bool) torch.Tensor {
 		C.Tensor(*input.T), C.int8_t(cInplace), &t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // LeakyRelu torch.nn.functional.leaky_relu
@@ -194,7 +193,7 @@ func LeakyRelu(input torch.Tensor, negativeSlope float64, inplace bool) torch.Te
 		C.double(negativeSlope), C.int8_t(cInplace), &t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // Linear ports torch.nn.functional.linear
@@ -209,7 +208,7 @@ func Linear(input, weight, bias torch.Tensor) torch.Tensor {
 		C.Tensor(*weight.T), cBias, &t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // MaxPool2d torch.nn.functional.max_pool2d
@@ -230,7 +229,7 @@ func MaxPool2d(input torch.Tensor, kernelSize, stride, padding,
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
 
 // AdaptiveAvgPool2d torch.nn.functional.adaptive_avg_pool2d
@@ -242,5 +241,41 @@ func AdaptiveAvgPool2d(input torch.Tensor, outputSize []int64) torch.Tensor {
 		&t)))
 	runtime.KeepAlive(input.T)
 	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
-	return torch.Tensor{(*unsafe.Pointer)(&t)}
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
+}
+
+// MultiHeadAttention implements the multi-head attention mechanism
+func MultiHeadAttention(query, key, value torch.Tensor, numHeads int64,
+	mask, dropout torch.Tensor) torch.Tensor {
+	var t C.Tensor
+	var cMask, cDropout C.Tensor
+
+	// Convert optional tensors
+	if mask.T != nil {
+		cMask = C.Tensor(*mask.T)
+	}
+	if dropout.T != nil {
+		cDropout = C.Tensor(*dropout.T)
+	}
+
+	// Note the pattern from BatchNorm:
+	// 1. Single MustNil call
+	// 2. Single KeepAlive for primary input
+	// 3. SetTensorFinalizer before return
+	torch.MustNil(
+		unsafe.Pointer(C.MultiHeadAttention(
+			C.Tensor(*query.T),
+			C.Tensor(*key.T),
+			C.Tensor(*value.T),
+			C.int64_t(numHeads),
+			cMask,
+			cDropout,
+			&t)))
+
+	// Keep only primary input alive
+	runtime.KeepAlive(query.T)
+
+	// Set finalizer and return
+	torch.SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return torch.Tensor{T: (*unsafe.Pointer)(&t)}
 }
