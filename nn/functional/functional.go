@@ -259,7 +259,6 @@ func MultiHeadAttention(query, key, value torch.Tensor, numHeads int64,
 		cDropout = C.Tensor(*dropout.T)
 	}
 
-	// Note the pattern from BatchNorm:
 	// 1. Single MustNil call
 	// 2. Single KeepAlive for primary input
 	// 3. SetTensorFinalizer before return
