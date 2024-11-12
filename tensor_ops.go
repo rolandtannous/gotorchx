@@ -118,7 +118,9 @@ func (a *Tensor) DivI(other Tensor) Tensor {
 // Permute transpose the tensor dims.
 func (a *Tensor) Permute(dims []int64) Tensor {
 	var t C.Tensor
-	MustNil(unsafe.Pointer(C.Permute(C.Tensor(*a.T), (*C.int64_t)(&dims[0]), C.int64_t(len(dims)), &t)))
+	MustNil(
+		unsafe.Pointer(C.Permute(C.Tensor(*a.T), (*C.int64_t)(&dims[0]), C.int64_t(len(dims)), &t)),
+	)
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
@@ -405,7 +407,16 @@ func (a Tensor) Transpose(dim0, dim1 int64) Tensor {
 // View returns a new Tensor with the same data but of a different shape
 func View(a Tensor, shape ...int64) Tensor {
 	var t C.Tensor
-	MustNil(unsafe.Pointer(C.View(C.Tensor(*a.T), &t, (*C.int64_t)(unsafe.Pointer(&shape[0])), C.int64_t(len(shape)))))
+	MustNil(
+		unsafe.Pointer(
+			C.View(
+				C.Tensor(*a.T),
+				&t,
+				(*C.int64_t)(unsafe.Pointer(&shape[0])),
+				C.int64_t(len(shape)),
+			),
+		),
+	)
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
@@ -459,4 +470,20 @@ func (a Tensor) argMinMax(argmin bool, opts ...interface{}) Tensor {
 	}
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Triu returns the upper triangular part of the matrix
+func Triu(input Tensor, diagonal int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Triu(
+		C.Tensor(*input.T),
+		C.int64_t(diagonal),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{T: (*unsafe.Pointer)(&t)}
+}
+
+// Add the method version too
+func (a Tensor) Triu(diagonal int64) Tensor {
+	return Triu(a, diagonal)
 }

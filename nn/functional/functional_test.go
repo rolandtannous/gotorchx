@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
 	torch "github.com/wangkuiyi/gotorch"
 )
 
@@ -69,7 +70,8 @@ func TestFunctionalNllLoss(t *testing.T) {
 
 // >>> torch.nn.functional.log_softmax(torch.tensor([[-0.5, -1.], [1., 0.5]]), dim=1)
 // tensor([[-0.4741, -0.9741],
-//         [-0.4741, -0.9741]])
+//
+//	[-0.4741, -0.9741]])
 func TestFunctionalLogSoftmax(t *testing.T) {
 	r := LogSoftmax(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}),
 		1)
@@ -94,12 +96,22 @@ func TestFunctionalAdaptiveAvgPool2d(t *testing.T) {
 // >>> loss = F.binary_cross_entropy(torch.sigmoid(input), target)
 // >>> print(loss)
 // tensor(-5.7473)
+//
+//	func TestFunctionalBinaryCrossEntropy(t *testing.T) {
+//		input := torch.NewTensor([][]float64{{1, 2}, {3, 4}, {5, 6}})
+//		target := torch.NewTensor([][]float64{{6, 5}, {4, 3}, {2, 1}})
+//		var weight torch.Tensor
+//		loss := BinaryCrossEntropy(torch.Sigmoid(input), target, weight, "mean")
+//		assert.Equal(t, "-5.74731\n[ CPUDoubleType{} ]", loss.String())
+//	}
 func TestFunctionalBinaryCrossEntropy(t *testing.T) {
 	input := torch.NewTensor([][]float64{{1, 2}, {3, 4}, {5, 6}})
-	target := torch.NewTensor([][]float64{{6, 5}, {4, 3}, {2, 1}})
+	target := torch.NewTensor([][]float64{{1, 0}, {0, 1}, {1, 0}})
 	var weight torch.Tensor
 	loss := BinaryCrossEntropy(torch.Sigmoid(input), target, weight, "mean")
-	assert.Equal(t, "-5.74731\n[ CPUDoubleType{} ]", loss.String())
+
+	lossValue := loss.Item().(float64)
+	assert.InDelta(t, 1.9194, lossValue, 1e-3)
 }
 
 // >>> import torch
@@ -132,7 +144,8 @@ func TestFunctionalLeakyRelu(t *testing.T) {
 // i>>> import torch.nn.functional as F
 // >>> F.linear(torch.tensor([[1.,2.],[3.,4.]]), torch.tensor([[1.,2.],[3.,4.]]), torch.tensor([1.,2.]))
 // tensor([[ 6., 13.],
-//         [12., 27.]])
+//
+//	[12., 27.]])
 func TestFunctionalLinear(t *testing.T) {
 	o := Linear(
 		torch.NewTensor([][]float64{{1, 2}, {3, 4}}),

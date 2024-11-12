@@ -55,6 +55,12 @@ const char *MaxPool2d(Tensor input, int64_t *kernel_data, int64_t kernel_len,
 const char *AdaptiveAvgPool2d(Tensor input, int64_t *output_size_data,
                               int64_t output_size_len, Tensor *result);
 
+const char *MultiHeadAttention(Tensor query, Tensor key, Tensor value,
+    int64_t num_heads, Tensor mask, Tensor dropout, Tensor *result);
+
+const char *FlashAttention(Tensor query, Tensor key, Tensor value,
+    double dropout_p, bool is_causal, Tensor *result);
+
 #ifdef __cplusplus
 }
 #endif

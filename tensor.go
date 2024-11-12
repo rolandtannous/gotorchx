@@ -189,3 +189,10 @@ func (a Tensor) Index(index ...int64) Tensor {
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
+
+// IsPinned returns true if the tensor's memory is pinned
+func (t Tensor) IsPinned() bool {
+	var result C.bool
+	MustNil(unsafe.Pointer(C.Tensor_IsPinned(C.Tensor(*t.T), &result)))
+	return bool(result)
+}

@@ -1,0 +1,30 @@
+feat(attention): Add MultiHeadAttention implementation and basic test
+
+Add initial implementation of MultiHeadAttention following PyTorch 2.5.1's approach.
+This commit provides the foundational attention mechanism required for transformer
+architectures.
+
+Implementation Details:
+- Accept 3D input tensors (seq_len, batch_size, embed_dim)
+- Handle dimension transformations internally (3D → 4D → 3D)
+- Support configurable number of attention heads
+- Match PyTorch's dimension conventions
+
+Core Changes:
+- Add MultiHeadAttention function in functional.cc
+- Add basic test case in attention_test.go
+- Handle error cases using exception_str pattern
+
+Testing:
+- Verify correct shape transformations
+- Validate output dimensions
+- Basic functionality test with random inputs
+
+Next Steps:
+- Add masking support tests
+- Add dropout tests
+- Add variable sequence length tests
+- Add GPU support
+- Implement attention optimizations
+
+Related to PyTorch upgrade to 2.5.1
