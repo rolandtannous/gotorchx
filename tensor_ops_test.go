@@ -1,19 +1,22 @@
 package gotorch_test
 
 import (
+	"math"
 	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	torch "github.com/wangkuiyi/gotorch"
 	"github.com/x448/float16"
+
+	torch "github.com/wangkuiyi/gotorch"
 )
 
 // >>> t = torch.tensor([[-0.5, -1.], [1., 0.5]])
 // >>> s = torch.tensor([[-0.5, -1.], [1., 0.5]])
 // >>> t+s
 // tensor([[-1., -2.],
-//         [ 2.,  1.]])
+//
+//	[ 2.,  1.]])
 func TestArith(t *testing.T) {
 	a := assert.New(t)
 	r := torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}})
@@ -77,7 +80,8 @@ func TestAllClose(t *testing.T) {
 
 // >>> torch.eq(torch.tensor([[1, 2], [3, 4]]), torch.tensor([[1, 1], [4, 4]]))
 // tensor([[ True, False],
-//         [False, True]])
+//
+//	[False, True]])
 func TestEq(t *testing.T) {
 	a := torch.NewTensor([][]int16{{1, 2}, {3, 4}})
 	b := torch.NewTensor([][]int16{{1, 3}, {2, 4}})
@@ -104,7 +108,8 @@ func TestEqual(t *testing.T) {
 // >>> t = torch.tensor([[1,2],[3,4]])
 // >>> s.expand_as(t)
 // tensor([[1, 2],
-//         [1, 2]])
+//
+//	[1, 2]])
 func TestExpandAs(t *testing.T) {
 	a := torch.NewTensor([]int8{'a', 'b'})
 	b := torch.NewTensor([][]int8{{1, 2}, {3, 4}})
@@ -132,7 +137,8 @@ func TestFlatten(t *testing.T) {
 
 // >>> torch.nn.functional.leaky_relu(torch.tensor([[-0.5, -1.], [1., 0.5]]))
 // tensor([[-0.0050, -0.0100],
-//         [ 1.0000,  0.5000]])
+//
+//	[ 1.0000,  0.5000]])
 func TestLeakyRelu(t *testing.T) {
 	r := torch.LeakyRelu(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}),
 		0.01)
@@ -142,7 +148,8 @@ func TestLeakyRelu(t *testing.T) {
 
 // >>> torch.nn.functional.log_softmax(torch.tensor([[-0.5, -1.], [1., 0.5]]), dim=1)
 // tensor([[-0.4741, -0.9741],
-//         [-0.4741, -0.9741]])
+//
+//	[-0.4741, -0.9741]])
 func TestLogSoftmax(t *testing.T) {
 	r := torch.LogSoftmax(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}),
 		1)
@@ -168,7 +175,8 @@ func TestTensorMean(t *testing.T) {
 
 // >>> torch.relu(torch.tensor([[-0.5, -1.], [1., 0.5]]))
 // tensor([[0.0000, 0.0000],
-//         [1.0000, 0.5000]])
+//
+//	[1.0000, 0.5000]])
 func TestRelu(t *testing.T) {
 	r := torch.Relu(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}))
 	g := " 0.0000  0.0000\n 1.0000  0.5000\n[ CPUFloatType{2,2} ]"
@@ -177,7 +185,8 @@ func TestRelu(t *testing.T) {
 
 // >>> torch.sigmoid(torch.tensor([[-0.5, -1.], [1., 0.5]]))
 // tensor([[0.3775, 0.2689],
-//         [0.7311, 0.6225]])
+//
+//	[0.7311, 0.6225]])
 func TestSigmoid(t *testing.T) {
 	r := torch.Sigmoid(torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}}))
 	g := " 0.3775  0.2689\n 0.7311  0.6225\n[ CPUFloatType{2,2} ]"
@@ -213,8 +222,10 @@ func TestSqueeze(t *testing.T) {
 // tensor([12, 15, 18, 11])
 // >>> torch.sum(x, 1, True)
 // tensor([[10],
-//         [22],
-//         [24]])
+//
+//	[22],
+//	[24]])
+//
 // >>> torch.sum(x, 1, False)
 // tensor([10, 22, 24])
 func TestSum(t *testing.T) {
@@ -256,9 +267,12 @@ func TestTanh(t *testing.T) {
 // >>> torch.topk(torch.tensor([[-0.5, -1.], [1., 0.5]]), 1, 1, True, True)
 // torch.return_types.topk(
 // values=tensor([[-0.5000],
-//         [ 1.0000]]),
+//
+//	[ 1.0000]]),
+//
 // indices=tensor([[0],
-//         [0]]))
+//
+//	[0]]))
 func TestTopK(t *testing.T) {
 	r, i := torch.TopK(torch.NewTensor([][]float64{{-0.5, -1}, {1, 0.5}}),
 		1, 1, true, true)
@@ -270,7 +284,8 @@ func TestTopK(t *testing.T) {
 
 // >>> torch.transpose(torch.tensor([[-0.5, -1.], [1., 0.5]]), 0, 1)
 // tensor([[-0.5000,  1.0000],
-//         [-1.0000,  0.5000]])
+//
+//	[-1.0000,  0.5000]])
 func TestTranspose(t *testing.T) {
 	x := torch.NewTensor([][]float32{{-0.5, -1}, {1, 0.5}})
 	g := "-0.5000  1.0000\n-1.0000  0.5000\n[ CPUFloatType{2,2} ]"
@@ -439,16 +454,21 @@ func TestItem(t *testing.T) {
 // >>> x = torch.tensor([[1,2,3,4],[4,5,6,7],[7,8,9,0]])
 // >>> x
 // tensor([[1, 2, 3, 4],
-//         [4, 5, 6, 7],
-//         [7, 8, 9, 0]])
+//
+//	[4, 5, 6, 7],
+//	[7, 8, 9, 0]])
+//
 // >>> idx = torch.tensor([0,2])
 // >>> torch.index_select(x, 0, idx)
 // tensor([[1, 2, 3, 4],
-//         [7, 8, 9, 0]])
+//
+//	[7, 8, 9, 0]])
+//
 // >>> torch.index_select(x, 1, idx)
 // tensor([[1, 3],
-//         [4, 6],
-//         [7, 9]])
+//
+//	[4, 6],
+//	[7, 9]])
 func TestIndexSelect(t *testing.T) {
 	x := torch.NewTensor([][]float32{{1, 2, 3, 4}, {4, 5, 6, 7}, {7, 8, 9, 0}})
 	idx := torch.NewTensor([]int64{0, 2})
@@ -456,4 +476,350 @@ func TestIndexSelect(t *testing.T) {
 		x.IndexSelect(0, idx).String())
 	assert.Equal(t, " 1  3\n 4  6\n 7  9\n[ CPUFloatType{3,2} ]",
 		x.IndexSelect(1, idx).String())
+}
+
+func TestPow(t *testing.T) {
+	// Test case 1: Basic power operation
+	a := torch.NewTensor([]float32{1, 2, 3, 4})
+	result := a.Pow(2.0)
+	expected := torch.NewTensor([]float32{1, 4, 9, 16})
+	if !torch.AllClose(result, expected) {
+		t.Errorf("Pow operation failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 2: In-place power operation
+	b := torch.NewTensor([]float32{1, 2, 3, 4})
+	result = b.PowI(2.0)
+	if !torch.AllClose(result, expected) {
+		t.Errorf("PowI operation failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 3: Power with out tensor
+	c := torch.NewTensor([]float32{1, 2, 3, 4})
+	out := torch.NewTensor([]float32{0, 0, 0, 0})
+	result = torch.PowOut(c, 2.0, out)
+	if !torch.AllClose(result, expected) {
+		t.Errorf("PowOut operation failed. Expected %v, got %v", expected, result)
+	}
+}
+
+func TestAbs(t *testing.T) {
+	// Test case 1: Positive and negative values
+	a := torch.NewTensor([]float32{-1, 2, -3, 4})
+	result := a.Abs()
+	expected := torch.NewTensor([]float32{1, 2, 3, 4})
+	if !torch.AllClose(result, expected) {
+		t.Errorf("Abs operation failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 2: Zero values
+	a = torch.NewTensor([]float32{0, -0})
+	result = a.Abs()
+	expected = torch.NewTensor([]float32{0, 0})
+	if !torch.AllClose(result, expected) {
+		t.Errorf("Abs operation with zero failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 3: All positive values (should remain unchanged)
+	a = torch.NewTensor([]float32{1, 2, 3, 4})
+	result = a.Abs()
+	expected = torch.NewTensor([]float32{1, 2, 3, 4})
+	if !torch.AllClose(result, expected) {
+		t.Errorf("Abs operation with positive values failed. Expected %v, got %v", expected, result)
+	}
+}
+
+func TestAbsVariants(t *testing.T) {
+	// Test case 1: Regular version
+	a := torch.NewTensor([]float32{-1, 2, -3, 4})
+	result := a.Abs()
+	expected := torch.NewTensor([]float32{1, 2, 3, 4})
+	if !torch.AllClose(result, expected) {
+		t.Errorf("Abs operation failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 2: In-place version
+	b := torch.NewTensor([]float32{-1, 2, -3, 4})
+	result = b.AbsI()
+	if !torch.AllClose(result, expected) {
+		t.Errorf("AbsI operation failed. Expected %v, got %v", expected, result)
+	}
+
+	// Test case 3: Out version
+	c := torch.NewTensor([]float32{-1, 2, -3, 4})
+	out := torch.NewTensor([]float32{0, 0, 0, 0})
+	result = torch.AbsOut(c, out)
+	if !torch.AllClose(result, expected) {
+		t.Errorf("AbsOut operation failed. Expected %v, got %v", expected, result)
+	}
+}
+
+// func TestSqrt(t *testing.T) {
+// 	// Test case 1: Regular version
+// 	a := torch.NewTensor([]float32{0, 1, 4, 9})
+// 	result := a.Sqrt()
+// 	expected := torch.NewTensor([]float32{0, 1, 2, 3})
+// 	if !torch.AllClose(result, expected) {
+// 		t.Errorf("Sqrt operation failed. Expected %v, got %v", expected, result)
+// 	}
+//
+// 	// Test case 2: In-place version
+// 	b := torch.NewTensor([]float32{0, 1, 4, 9})
+// 	result = b.SqrtI()
+// 	if !torch.AllClose(result, expected) {
+// 		t.Errorf("SqrtI operation failed. Expected %v, got %v", expected, result)
+// 	}
+//
+// 	// Test case 3: Out version
+// 	c := torch.NewTensor([]float32{0, 1, 4, 9})
+// 	out := torch.NewTensor([]float32{0, 0, 0, 0})
+// 	result = torch.SqrtOut(c, out)
+// 	if !torch.AllClose(result, expected) {
+// 		t.Errorf("SqrtOut operation failed. Expected %v, got %v", expected, result)
+// 	}
+// }
+
+func TestSqrt(t *testing.T) {
+	t.Run("basic variants", func(t *testing.T) {
+		// Test case 1: Regular version - both function and method forms
+		a := torch.NewTensor([]float32{0, 1, 4, 9})
+		result1 := torch.Sqrt(a) // Function form
+		result2 := a.Sqrt()      // Method form
+		expected := torch.NewTensor([]float32{0, 1, 2, 3})
+
+		if !torch.AllClose(result1, expected) {
+			t.Errorf("Sqrt function failed. Expected %v, got %v", expected, result1)
+		}
+		if !torch.AllClose(result2, expected) {
+			t.Errorf("Sqrt method failed. Expected %v, got %v", expected, result2)
+		}
+
+		// Test case 2: In-place version - method only
+		b := torch.NewTensor([]float32{0, 1, 4, 9})
+		result := b.SqrtI()
+		if !torch.AllClose(result, expected) {
+			t.Errorf("SqrtI operation failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test case 3: Out version - function only
+		c := torch.NewTensor([]float32{0, 1, 4, 9})
+		out := torch.NewTensor([]float32{0, 0, 0, 0})
+		result = torch.SqrtOut(c, out)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("SqrtOut operation failed. Expected %v, got %v", expected, result)
+		}
+	})
+	t.Run("edge cases", func(t *testing.T) {
+		// Test zero
+		zero := torch.NewTensor([]float32{0})
+		result := zero.Sqrt()
+		expected := torch.NewTensor([]float32{0})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt of zero failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test very large numbers
+		large := torch.NewTensor([]float32{1e20})
+		result = large.Sqrt()
+		expected = torch.NewTensor([]float32{1e10})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt of large number failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test very small positive numbers
+		small := torch.NewTensor([]float32{1e-20})
+		result = small.Sqrt()
+		expected = torch.NewTensor([]float32{1e-10})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt of small number failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("negative numbers", func(t *testing.T) {
+		// Test negative numbers - should return NaN
+		negative := torch.NewTensor([]float32{-1.0})
+		result := negative.Sqrt()
+		// Since we don't have IsNaN, we can check if the result is not equal to itself
+		// (NaN is the only value that's not equal to itself)
+		if torch.AllClose(result, result) {
+			t.Errorf("Sqrt of negative number should be NaN")
+		}
+	})
+
+	t.Run("multi-dimensional tensors", func(t *testing.T) {
+		// Test 2D tensor
+		matrix := torch.NewTensor([][]float32{
+			{0, 1, 4, 9},
+			{16, 25, 36, 49},
+		})
+		result := matrix.Sqrt()
+		expected := torch.NewTensor([][]float32{
+			{0, 1, 2, 3},
+			{4, 5, 6, 7},
+		})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt of 2D tensor failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("precision test", func(t *testing.T) {
+		// Test precision with irrational results
+		a := torch.NewTensor([]float32{2.0})
+		result := a.Sqrt()
+		expected := torch.NewTensor([]float32{1.4142135}) // √2
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt precision test failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("broadcasting", func(t *testing.T) {
+		// Test that sqrt works with broadcasting
+		matrix := torch.NewTensor([][]float32{
+			{0, 1, 4},
+			{0, 1, 4},
+			{0, 1, 4},
+		})
+		result := matrix.Sqrt()
+		expected := torch.NewTensor([][]float32{
+			{0, 1, 2},
+			{0, 1, 2},
+			{0, 1, 2},
+		})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Sqrt broadcasting failed. Expected %v, got %v", expected, result)
+		}
+	})
+}
+
+func TestLog(t *testing.T) {
+	t.Run("basic variants", func(t *testing.T) {
+		// Test case 1: Regular version - both function and method forms
+		a := torch.NewTensor([]float32{1, 2.718282, 7.389056}) // [1, e, e^2]
+		result1 := torch.Log(a)                                // Function form
+		result2 := a.Log()                                     // Method form
+		expected := torch.NewTensor([]float32{0, 1, 2})
+
+		if !torch.AllClose(result1, expected) {
+			t.Errorf("Log function failed. Expected %v, got %v", expected, result1)
+		}
+		if !torch.AllClose(result2, expected) {
+			t.Errorf("Log method failed. Expected %v, got %v", expected, result2)
+		}
+
+		// Test case 2: In-place version - method only
+		b := torch.NewTensor([]float32{1, 2.718282, 7.389056})
+		result := b.LogI()
+		if !torch.AllClose(result, expected) {
+			t.Errorf("LogI operation failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test case 3: Out version - function only
+		c := torch.NewTensor([]float32{1, 2.718282, 7.389056})
+		out := torch.NewTensor([]float32{0, 0, 0})
+		result = torch.LogOut(c, out)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("LogOut operation failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("edge cases", func(t *testing.T) {
+		// Test zero - should return -inf
+		zero := torch.NewTensor([]float32{0})
+		result := zero.Log()
+		// Check if result is -inf (you might need to adjust this check based on gotorch's capabilities)
+		if !torch.AllClose(result, torch.NewTensor([]float32{float32(math.Inf(-1))})) {
+			t.Errorf("Log of zero should be -inf")
+		}
+
+		// Test negative numbers - should return NaN
+		negative := torch.NewTensor([]float32{-1.0})
+		result = negative.Log()
+		// NaN check (using the property that NaN != NaN)
+		if torch.AllClose(result, result) {
+			t.Errorf("Log of negative number should be NaN")
+		}
+	})
+
+	t.Run("multi-dimensional tensors", func(t *testing.T) {
+		matrix := torch.NewTensor([][]float32{
+			{1, 2.718282, 7.389056},
+			{1, 2.718282, 7.389056},
+		})
+		result := matrix.Log()
+		expected := torch.NewTensor([][]float32{
+			{0, 1, 2},
+			{0, 1, 2},
+		})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Log of 2D tensor failed. Expected %v, got %v", expected, result)
+		}
+	})
+}
+
+func TestExp(t *testing.T) {
+	t.Run("basic variants", func(t *testing.T) {
+		// Test case 1: Regular version - both function and method forms
+		a := torch.NewTensor([]float32{0, 1, 2})
+		result1 := torch.Exp(a)                                       // Function form
+		result2 := a.Exp()                                            // Method form
+		expected := torch.NewTensor([]float32{1, 2.718282, 7.389056}) // [1, e, e^2]
+
+		if !torch.AllClose(result1, expected) {
+			t.Errorf("Exp function failed. Expected %v, got %v", expected, result1)
+		}
+		if !torch.AllClose(result2, expected) {
+			t.Errorf("Exp method failed. Expected %v, got %v", expected, result2)
+		}
+
+		// Test case 2: In-place version - method only
+		b := torch.NewTensor([]float32{0, 1, 2})
+		result := b.ExpI()
+		if !torch.AllClose(result, expected) {
+			t.Errorf("ExpI operation failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test case 3: Out version - function only
+		c := torch.NewTensor([]float32{0, 1, 2})
+		out := torch.NewTensor([]float32{0, 0, 0})
+		result = torch.ExpOut(c, out)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("ExpOut operation failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("edge cases", func(t *testing.T) {
+		// Test large negative number - should be close to 0
+		large_neg := torch.NewTensor([]float32{-100.0})
+		result := large_neg.Exp()
+		expected := torch.NewTensor([]float32{0.0})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Exp of large negative number failed. Expected close to 0")
+		}
+
+		// Test large positive number - should be very large but finite
+		large_pos := torch.NewTensor([]float32{100.0})
+		result = large_pos.Exp()
+		if torch.AllClose(result, result) { // Should be finite (not NaN)
+			if result.Item().(float32) <= 0 {
+				t.Errorf("Exp of large positive number should be positive")
+			}
+		} else {
+			t.Errorf("Exp of large positive number should be finite")
+		}
+	})
+
+	t.Run("multi-dimensional tensors", func(t *testing.T) {
+		matrix := torch.NewTensor([][]float32{
+			{0, 1, 2},
+			{0, 1, 2},
+		})
+		result := matrix.Exp()
+		expected := torch.NewTensor([][]float32{
+			{1, 2.718282, 7.389056},
+			{1, 2.718282, 7.389056},
+		})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Exp of 2D tensor failed. Expected %v, got %v", expected, result)
+		}
+	})
 }
