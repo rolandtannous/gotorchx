@@ -8,4 +8,4 @@ require (
 	gocv.io/x/gocv v0.24.0
 )
 
-replace github.com/wangkuiyi/gotorch => /home/mlengineer/gotorch
+replace github.com/wangkuiyi/gotorch => /home/mlengineer/gotorch-updated

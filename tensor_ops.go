@@ -487,3 +487,148 @@ func Triu(input Tensor, diagonal int64) Tensor {
 func (a Tensor) Triu(diagonal int64) Tensor {
 	return Triu(a, diagonal)
 }
+
+// Pow returns a new tensor with the elements of input raised to the power of exponent
+func Pow(input Tensor, exponent float64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Pow(C.Tensor(*input.T), C.double(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Pow returns a new tensor with the elements of input raised to the power of exponent
+func (a Tensor) Pow(exponent float64) Tensor {
+	return Pow(a, exponent)
+}
+
+// PowI performs power operation in-place
+func (a *Tensor) PowI(exponent float64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Pow_(C.Tensor(*a.T), C.double(exponent), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// PowOut performs power operation and stores result in out
+func PowOut(input Tensor, exponent float64, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.PowOut(C.Tensor(*input.T), C.double(exponent), C.Tensor(*out.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Abs returns a new tensor with the absolute value of each element in input
+func Abs(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Abs(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Abs returns a new tensor with the absolute value of each element in input
+func (a Tensor) Abs() Tensor {
+	return Abs(a)
+}
+
+// AbsI performs absolute value operation in-place
+func (a *Tensor) AbsI() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Abs_(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// AbsOut performs absolute value operation and stores result in out
+func AbsOut(input, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.AbsOut(C.Tensor(*input.T), C.Tensor(*out.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Sqrt returns a new tensor with the square root of the elements
+func Sqrt(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Sqrt(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Sqrt returns a new tensor with the square root of the elements
+func (a Tensor) Sqrt() Tensor {
+	return Sqrt(a)
+}
+
+// SqrtI computes the square root in-place
+func (a *Tensor) SqrtI() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Sqrt_(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// SqrtOut computes the square root and stores the result in out
+func SqrtOut(input Tensor, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.SqrtOut(C.Tensor(*input.T), C.Tensor(*out.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Regular version - both function and method forms
+func Log(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Log(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Method version of Log
+func (a Tensor) Log() Tensor {
+	return Log(a)
+}
+
+// In-place version - method only
+func (a *Tensor) LogI() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Log_(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Out version - function only
+func LogOut(input Tensor, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.LogOut(C.Tensor(*input.T), C.Tensor(*out.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Regular version - both function and method forms
+func Exp(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Exp(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Method version of Exp
+func (a Tensor) Exp() Tensor {
+	return Exp(a)
+}
+
+// In-place version - method only
+func (a *Tensor) ExpI() Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Exp_(C.Tensor(*a.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Out version - function only
+func ExpOut(input Tensor, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.ExpOut(C.Tensor(*input.T), C.Tensor(*out.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}

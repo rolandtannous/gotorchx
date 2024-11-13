@@ -55,6 +55,7 @@ const char *Tensor_Index(Tensor a, int64_t *index, int64_t index_len,
 // Add this with the other tensor operations
 const char *Triu(Tensor input, int64_t diagonal, Tensor *result);
 
+
 #ifdef __cplusplus
 }
 #endif

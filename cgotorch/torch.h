@@ -74,6 +74,28 @@ const char *Argmax(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result);
 const char *Mean(Tensor a, Tensor *result);
 const char *Stack(Tensor *tensors, int64_t tensors_size, int64_t dim,
                   Tensor *result);
+
+// Add to the existing declarations
+const char *Pow(Tensor input, double exponent, Tensor *result);
+const char *Pow_(Tensor input, double exponent, Tensor *result);  // In-place version
+const char *PowOut(Tensor input, double exponent, Tensor out, Tensor *result);  // Out version
+
+const char *Abs(Tensor input, Tensor *result);
+const char *Abs_(Tensor input, Tensor *result);  // In-place version
+const char *AbsOut(Tensor input, Tensor out, Tensor *result);  // Out version
+                                                               //
+const char *Sqrt(Tensor input, Tensor *result);
+const char *Sqrt_(Tensor input, Tensor *result);
+const char *SqrtOut(Tensor input, Tensor out, Tensor *result);
+
+const char *Log(Tensor input, Tensor *result);
+const char *Log_(Tensor input, Tensor *result);
+const char *LogOut(Tensor input, Tensor out, Tensor *result);
+
+const char *Exp(Tensor input, Tensor *result);
+const char *Exp_(Tensor input, Tensor *result);
+const char *ExpOut(Tensor input, Tensor out, Tensor *result);
+
 #ifdef __cplusplus
 }
 #endif

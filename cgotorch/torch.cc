@@ -438,3 +438,155 @@ const char *Argmax(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result) {
     return exception_str(e.what());
   }
 }
+
+
+const char *Pow(Tensor input, double exponent, Tensor *result) {
+    try {
+        at::Tensor out = at::pow(*input, exponent);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Pow_(Tensor input, double exponent, Tensor *result) {
+    try {
+        input->pow_(exponent);  // Using the tensor's in-place method directly
+        *result = new at::Tensor(*input);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *PowOut(Tensor input, double exponent, Tensor out, Tensor *result) {
+    try {
+        at::pow_out(*out, *input, exponent);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Abs(Tensor input, Tensor *result) {
+    try {
+        // Using at:: since this is a fundamental operation
+        at::Tensor out = at::abs(*input);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Abs_(Tensor input, Tensor *result) {
+    try {
+        at::Tensor out = at::abs_(*input);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *AbsOut(Tensor input, Tensor out, Tensor *result) {
+    try {
+        at::abs_out(*out, *input);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Sqrt(Tensor input, Tensor *result) {
+    try {
+        at::Tensor out = at::sqrt(*input);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Sqrt_(Tensor input, Tensor *result) {
+    try {
+        input->sqrt_();
+        *result = new at::Tensor(*input);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *SqrtOut(Tensor input, Tensor out, Tensor *result) {
+    try {
+        at::sqrt_out(*out, *input);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Log(Tensor input, Tensor *result) {
+    try {
+        at::Tensor out = at::log(*input);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Log_(Tensor input, Tensor *result) {
+    try {
+        input->log_();
+        *result = new at::Tensor(*input);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *LogOut(Tensor input, Tensor out, Tensor *result) {
+    try {
+        at::log_out(*out, *input);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Exp(Tensor input, Tensor *result) {
+    try {
+        at::Tensor out = at::exp(*input);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Exp_(Tensor input, Tensor *result) {
+    try {
+        input->exp_();
+        *result = new at::Tensor(*input);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *ExpOut(Tensor input, Tensor out, Tensor *result) {
+    try {
+        at::exp_out(*out, *input);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
