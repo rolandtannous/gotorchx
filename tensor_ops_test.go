@@ -1080,3 +1080,85 @@ func TestCat(t *testing.T) {
 		})
 	})
 }
+func TestCatWithNames(t *testing.T) {
+	t.Run("basic named dimension concatenation", func(t *testing.T) {
+		// Create two 2x2 tensors with named dimensions
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		b := torch.NewTensor([][]float32{{5, 6}, {7, 8}})
+
+		// Create dimension names
+		batch := torch.NewDimname("batch", false)
+		features := torch.NewDimname("features", false)
+
+		// Name the dimensions
+		a = a.SetNames(batch, features)
+		b = b.SetNames(batch, features)
+
+		// Concatenate along batch dimension
+		result := torch.CatWithNames([]torch.Tensor{a, b}, batch)
+
+		// Test 1: Verify shape
+		assert.Equal(t, []int64{4, 2}, result.Shape(), "Shape should be [4, 2]")
+
+		// Test 2: Verify dimension names and their order
+		names := result.Names()
+		assert.Equal(t, 2, len(names), "Should have 2 named dimensions")
+		assert.Equal(t, "batch", names[0].String(), "First dimension should be named 'batch'")
+		assert.Equal(
+			t,
+			"features",
+			names[1].String(),
+			"Second dimension should be named 'features'",
+		)
+
+		// Test 3: Verify individual values
+		// This ensures we're not just checking names but also correct concatenation
+		value00 := result.Index(0, 0).Item().(float32)
+		assert.Equal(t, float32(1), value00, "First element should be 1")
+
+		value21 := result.Index(2, 1).Item().(float32)
+		assert.Equal(t, float32(6), value21, "Element at [2,1] should be 6")
+	})
+
+	// Add error cases
+	t.Run("mismatched dimension names", func(t *testing.T) {
+		a := torch.NewTensor([][]float32{{1, 2}})
+		b := torch.NewTensor([][]float32{{3, 4}})
+
+		a = a.SetNames(
+			torch.NewDimname("batch", false),
+			torch.NewDimname("features", false),
+		)
+		b = b.SetNames(
+			torch.NewDimname("different", false),
+			torch.NewDimname("features", false),
+		)
+
+		// Should panic or return error due to mismatched names
+		assert.Panics(t, func() {
+			torch.CatWithNames([]torch.Tensor{a, b}, torch.NewDimname("batch", false))
+		})
+	})
+
+	t.Run("concatenation along different named dimensions", func(t *testing.T) {
+		a := torch.NewTensor([][]float32{{1, 2}})
+		b := torch.NewTensor([][]float32{{3, 4}})
+
+		batch := torch.NewDimname("batch", false)
+		features := torch.NewDimname("features", false)
+
+		a = a.SetNames(batch, features)
+		b = b.SetNames(batch, features)
+
+		// Test concatenation along features dimension
+		result := torch.CatWithNames([]torch.Tensor{a, b}, features)
+
+		// Verify shape changed in the correct dimension
+		assert.Equal(t, []int64{1, 4}, result.Shape())
+
+		// Verify names maintained correct order
+		names := result.Names()
+		assert.Equal(t, "batch", names[0].String())
+		assert.Equal(t, "features", names[1].String())
+	})
+}

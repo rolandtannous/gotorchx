@@ -106,6 +106,9 @@ const char *Reshape(Tensor input, int64_t *shape, int64_t shape_len, Tensor *res
 // Add to the existing declarations
 const char *Cat(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor *result);
 const char *CatOut(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor out, Tensor *result);
+// Add named dimension cat operation
+const char *CatWithNames(Tensor *tensors, int64_t tensors_size, Dimname dim, Tensor *result);
+const char *CatWithNamesOut(Tensor *tensors, int64_t tensors_size, Dimname dim, Tensor out, Tensor *result);
 
 
 // Named Dimensions Operations
