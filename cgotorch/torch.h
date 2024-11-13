@@ -107,6 +107,16 @@ const char *Reshape(Tensor input, int64_t *shape, int64_t shape_len, Tensor *res
 const char *Cat(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor *result);
 const char *CatOut(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor out, Tensor *result);
 
+
+// Named Dimensions Operations
+const char *NewDimname(const char* name, bool is_wildcard, Dimname *result);
+const char *FreeDimname(Dimname dimname);
+const char *SetTensorDimnames(Tensor tensor, Dimname* names, int64_t num_names);
+const char *GetTensorDimnames(Tensor tensor, Dimname** names, int64_t* num_names);
+const char *DimnameToString(Dimname dimname, const char** result);
+
+// Add to the existing declarations
+// Change from double to float
 #ifdef __cplusplus
 }
 #endif
