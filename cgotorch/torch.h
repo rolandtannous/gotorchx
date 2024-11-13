@@ -96,6 +96,17 @@ const char *Exp(Tensor input, Tensor *result);
 const char *Exp_(Tensor input, Tensor *result);
 const char *ExpOut(Tensor input, Tensor out, Tensor *result);
 
+// Shape operations
+const char *Unsqueeze(Tensor input, int64_t dim, Tensor *result);
+const char *Unsqueeze_(Tensor input, int64_t dim, Tensor *result);  // In-place version
+                                                                    //
+// Add to the existing declarations
+const char *Reshape(Tensor input, int64_t *shape, int64_t shape_len, Tensor *result);
+
+// Add to the existing declarations
+const char *Cat(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor *result);
+const char *CatOut(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor out, Tensor *result);
+
 #ifdef __cplusplus
 }
 #endif
