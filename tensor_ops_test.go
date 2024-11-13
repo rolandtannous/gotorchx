@@ -823,3 +823,260 @@ func TestExp(t *testing.T) {
 		}
 	})
 }
+
+// Shape operations test suite
+
+func TestUnsqueeze(t *testing.T) {
+	t.Run("basic variants", func(t *testing.T) {
+		// Test case 1: Regular version - both function and method forms
+		a := torch.NewTensor([]float32{1, 2, 3})
+		result1 := torch.Unsqueeze(a, 0) // Function form
+		result2 := a.Unsqueeze(0)        // Method form
+		// Unsqueeze at dim 0 adds a dimension at the start
+		expected := torch.NewTensor([][]float32{{1, 2, 3}}) // [1, 3] -> [1, 1, 3]
+
+		if !torch.AllClose(result1, expected) {
+			t.Errorf("Unsqueeze function failed. Expected %v, got %v", expected, result1)
+		}
+		if !torch.AllClose(result2, expected) {
+			t.Errorf("Unsqueeze method failed. Expected %v, got %v", expected, result2)
+		}
+
+		// Test case 2: In-place version
+		b := torch.NewTensor([]float32{1, 2, 3})
+		result := b.UnsqueezeI(0)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("UnsqueezeI operation failed. Expected %v, got %v", expected, result)
+		}
+
+		// Test case 3: Unsqueeze at dimension 1
+		c := torch.NewTensor([]float32{1, 2, 3})
+		result = c.Unsqueeze(1)
+		expected = torch.NewTensor([][]float32{{1}, {2}, {3}}) // [3] -> [3, 1]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Unsqueeze at dim 1 failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("multi-dimensional tensors", func(t *testing.T) {
+		matrix := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		result := matrix.Unsqueeze(0)
+		expected := torch.NewTensor([][][]float32{{{1, 2}, {3, 4}}}) // [2, 2] -> [1, 2, 2]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Unsqueeze of 2D tensor failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("negative dimensions", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3})
+		result := a.Unsqueeze(-1)
+		expected := torch.NewTensor([][]float32{{1}, {2}, {3}}) // [3] -> [3, 1]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Unsqueeze with negative dim failed. Expected %v, got %v", expected, result)
+		}
+	})
+}
+
+func TestUnsqueezeGPU(t *testing.T) {
+	// Skip if CUDA is not available
+	if !torch.IsCUDAAvailable() {
+		t.Skip("CUDA not available")
+	}
+
+	device := torch.NewDevice("cuda")
+
+	t.Run("basic GPU operation", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3})
+		a = a.To(device) // Move tensor to GPU
+
+		result := a.Unsqueeze(0)
+		expected := torch.NewTensor([][]float32{{1, 2, 3}}).To(device)
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("GPU Unsqueeze failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("GPU in-place operation", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3}).To(device)
+		result := a.UnsqueezeI(0)
+		expected := torch.NewTensor([][]float32{{1, 2, 3}}).To(device)
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("GPU UnsqueezeI failed. Expected %v, got %v", expected, result)
+		}
+	})
+}
+
+func TestReshape(t *testing.T) {
+	t.Run("basic reshape", func(t *testing.T) {
+		// Create a 1D tensor
+		a := torch.NewTensor([]float32{1, 2, 3, 4})
+
+		// Reshape to 2x2
+		result := a.Reshape(2, 2)
+		expected := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Reshape failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("automatic size inference", func(t *testing.T) {
+		// Create a 2x2 tensor
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+
+		// Use -1 to automatically infer size
+		result := a.Reshape(-1)
+		expected := torch.NewTensor([]float32{1, 2, 3, 4})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Reshape with size inference failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("multi-dimensional reshape", func(t *testing.T) {
+		// Create a 4x2 tensor
+		a := torch.NewTensor([][]float32{
+			{1, 2}, {3, 4}, {5, 6}, {7, 8},
+		})
+
+		// Reshape to 2x2x2
+		result := a.Reshape(2, 2, 2)
+		expected := torch.NewTensor([][][]float32{
+			{{1, 2}, {3, 4}},
+			{{5, 6}, {7, 8}},
+		})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Multi-dimensional reshape failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("gpu support", func(t *testing.T) {
+		if !torch.IsCUDAAvailable() {
+			t.Skip("CUDA not available")
+		}
+
+		device := torch.NewDevice("cuda")
+		a := torch.NewTensor([]float32{1, 2, 3, 4}).To(device)
+		result := a.Reshape(2, 2)
+		expected := torch.NewTensor([][]float32{{1, 2}, {3, 4}}).To(device)
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("GPU reshape failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("error cases", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3})
+
+		// This should panic as the new shape is invalid for the number of elements
+		assert.Panics(t, func() {
+			a.Reshape(2, 2)
+		})
+	})
+}
+
+func TestCat(t *testing.T) {
+	t.Run("basic concatenation", func(t *testing.T) {
+		// Create two 2x2 tensors
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		b := torch.NewTensor([][]float32{{5, 6}, {7, 8}})
+
+		// Concatenate along dimension 0 (adding rows)
+		result := torch.Cat([]torch.Tensor{a, b}, 0)
+		expected := torch.NewTensor([][]float32{
+			{1, 2},
+			{3, 4},
+			{5, 6},
+			{7, 8},
+		})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Cat along dim 0 failed. Expected %v, got %v", expected, result)
+		}
+
+		// Concatenate along dimension 1 (adding columns)
+		result = torch.Cat([]torch.Tensor{a, b}, 1)
+		expected = torch.NewTensor([][]float32{
+			{1, 2, 5, 6},
+			{3, 4, 7, 8},
+		})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Cat along dim 1 failed. Expected %v, got %v", expected, result)
+		}
+	})
+	t.Run("method variant", func(t *testing.T) {
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		b := torch.NewTensor([][]float32{{5, 6}, {7, 8}})
+
+		// Use the method variant
+		result := a.Cat([]torch.Tensor{b}, 0)
+		expected := torch.NewTensor([][]float32{
+			{1, 2},
+			{3, 4},
+			{5, 6},
+			{7, 8},
+		})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Cat method failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("out variant", func(t *testing.T) {
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		b := torch.NewTensor([][]float32{{5, 6}, {7, 8}})
+		out := torch.Empty([]int64{4, 2}, false)
+
+		result := torch.CatOut([]torch.Tensor{a, b}, 0, out)
+		expected := torch.NewTensor([][]float32{
+			{1, 2},
+			{3, 4},
+			{5, 6},
+			{7, 8},
+		})
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("CatOut failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("gpu support", func(t *testing.T) {
+		if !torch.IsCUDAAvailable() {
+			t.Skip("CUDA not available")
+		}
+
+		device := torch.NewDevice("cuda")
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}}).To(device)
+		b := torch.NewTensor([][]float32{{5, 6}, {7, 8}}).To(device)
+
+		result := torch.Cat([]torch.Tensor{a, b}, 0)
+		expected := torch.NewTensor([][]float32{
+			{1, 2},
+			{3, 4},
+			{5, 6},
+			{7, 8},
+		}).To(device)
+
+		if !torch.AllClose(result, expected) {
+			t.Errorf("GPU Cat failed. Expected %v, got %v", expected, result)
+		}
+	})
+
+	t.Run("error cases", func(t *testing.T) {
+		// Empty tensor list should panic
+		assert.Panics(t, func() {
+			torch.Cat([]torch.Tensor{}, 0)
+		})
+
+		// Tensors with incompatible shapes should panic
+		a := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+		b := torch.NewTensor([]float32{1, 2, 3})
+		assert.Panics(t, func() {
+			torch.Cat([]torch.Tensor{a, b}, 0)
+		})
+	})
+}

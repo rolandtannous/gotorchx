@@ -590,3 +590,64 @@ const char *ExpOut(Tensor input, Tensor out, Tensor *result) {
         return exception_str(e.what());
     }
 }
+
+
+// Shape operations
+
+const char *Unsqueeze(Tensor input, int64_t dim, Tensor *result) {
+    try {
+        at::Tensor out = at::unsqueeze(*input, dim);
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Unsqueeze_(Tensor input, int64_t dim, Tensor *result) {
+    try {
+        input->unsqueeze_(dim);
+        *result = new at::Tensor(*input);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Reshape(Tensor input, int64_t *shape, int64_t shape_len, Tensor *result) {
+    try {
+        at::Tensor out = at::reshape(*input, torch::IntArrayRef(shape, shape_len));
+        *result = new at::Tensor(out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Cat(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor *result) {
+    try {
+        std::vector<at::Tensor> tensor_list;
+        for (int64_t i = 0; i < tensors_size; i++) {
+            tensor_list.push_back(*tensors[i]);
+        }
+        at::Tensor output = at::cat(tensor_list, dim);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *CatOut(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor out, Tensor *result) {
+    try {
+        std::vector<at::Tensor> tensor_list;
+        for (int64_t i = 0; i < tensors_size; i++) {
+            tensor_list.push_back(*tensors[i]);
+        }
+        at::cat_out(*out, tensor_list, dim);
+        *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}

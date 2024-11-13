@@ -632,3 +632,87 @@ func ExpOut(input Tensor, out Tensor) Tensor {
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
+
+// Shape operations GO wrapper
+// Regular version - both function and method forms
+func Unsqueeze(input Tensor, dim int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Unsqueeze(C.Tensor(*input.T), C.int64_t(dim), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Method version
+func (a Tensor) Unsqueeze(dim int64) Tensor {
+	return Unsqueeze(a, dim)
+}
+
+// In-place version - method only
+func (a *Tensor) UnsqueezeI(dim int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Unsqueeze_(C.Tensor(*a.T), C.int64_t(dim), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Reshape returns a tensor with the same data but of a different shape
+func Reshape(input Tensor, shape ...int64) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Reshape(
+		C.Tensor(*input.T),
+		(*C.int64_t)(unsafe.Pointer(&shape[0])),
+		C.int64_t(len(shape)),
+		&t,
+	)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Reshape returns a tensor with the same data but of a different shape
+func (a Tensor) Reshape(shape ...int64) Tensor {
+	return Reshape(a, shape...)
+}
+
+// Cat concatenates the given sequence of tensors in the given dimension
+func Cat(tensors []Tensor, dim int64) Tensor {
+	var t C.Tensor
+	CT := make([]C.Tensor, len(tensors))
+	for i, tensor := range tensors {
+		CT[i] = C.Tensor(*tensor.T)
+	}
+	MustNil(unsafe.Pointer(C.Cat(
+		(*C.Tensor)(unsafe.Pointer(&CT[0])),
+		C.int64_t(len(CT)),
+		C.int64_t(dim),
+		&t,
+	)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+func (a Tensor) Cat(other []Tensor, dim int64) Tensor {
+	// Prepend the current tensor to the list of tensors
+	tensors := make([]Tensor, len(other)+1)
+	tensors[0] = a
+	copy(tensors[1:], other)
+	return Cat(tensors, dim)
+}
+
+// CatOut concatenates the given sequence of tensors in the given dimension
+// and stores the result in the out tensor
+func CatOut(tensors []Tensor, dim int64, out Tensor) Tensor {
+	var t C.Tensor
+	CT := make([]C.Tensor, len(tensors))
+	for i, tensor := range tensors {
+		CT[i] = C.Tensor(*tensor.T)
+	}
+	MustNil(unsafe.Pointer(C.CatOut(
+		(*C.Tensor)(unsafe.Pointer(&CT[0])),
+		C.int64_t(len(CT)),
+		C.int64_t(dim),
+		C.Tensor(*out.T),
+		&t,
+	)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
