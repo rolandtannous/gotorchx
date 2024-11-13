@@ -15,3 +15,4 @@ trace.out
 *.backup
 *.backup
 linux/libtorch/
+commit-message.txt

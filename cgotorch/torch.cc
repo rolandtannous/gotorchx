@@ -440,6 +440,7 @@ const char *Argmax(Tensor a, int64_t *dim, int8_t keepdim, Tensor *result) {
 }
 
 
+
 const char *Pow(Tensor input, double exponent, Tensor *result) {
     try {
         at::Tensor out = at::pow(*input, exponent);
@@ -646,6 +647,74 @@ const char *CatOut(Tensor *tensors, int64_t tensors_size, int64_t dim, Tensor ou
         }
         at::cat_out(*out, tensor_list, dim);
         *result = new at::Tensor(*out);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *NewDimname(const char* name, bool is_wildcard, Dimname *result) {
+    try {
+        if (is_wildcard) {
+            *result = new at::Dimname(at::Dimname::wildcard());
+        } else {
+            if (!at::Dimname::isValidName(name)) {
+                return exception_str("Invalid dimension name");
+            }
+            *result = new at::Dimname(at::Dimname::fromSymbol(at::Symbol::dimname(name)));
+        }
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *FreeDimname(Dimname dimname) {
+    try {
+        delete dimname;
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *SetTensorDimnames(Tensor tensor, Dimname* names, int64_t num_names) {
+    try {
+        std::vector<at::Dimname> dimnames;
+        for (int64_t i = 0; i < num_names; i++) {
+            dimnames.push_back(*names[i]);
+        }
+        // Use the proper function from namedtensor.h
+        at::internal_set_names_inplace(*tensor, std::move(dimnames), /*validate_names=*/true);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *GetTensorDimnames(Tensor tensor, Dimname** names, int64_t* num_names) {
+    try {
+        auto dimnames = tensor->names();  // This should work as it's a getter
+        *num_names = dimnames.size();
+        *names = new at::Dimname*[*num_names];
+        for (int64_t i = 0; i < *num_names; i++) {
+            (*names)[i] = new at::Dimname(dimnames[i]);
+        }
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *DimnameToString(Dimname dimname, const char** result) {
+    try {
+        std::string str;
+        if (dimname->isWildcard()) {
+            str = "*";
+        } else {
+            str = dimname->symbol().toUnqualString();
+        }
+        *result = strdup(str.c_str());
         return nullptr;
     } catch (const std::exception &e) {
         return exception_str(e.what());

@@ -1,30 +1,47 @@
-feat(attention): Add MultiHeadAttention implementation and basic test
+feat: Implement tensor named dimensions support
 
-Add initial implementation of MultiHeadAttention following PyTorch 2.5.1's approach.
-This commit provides the foundational attention mechanism required for transformer
-architectures.
+Add support for named tensor dimensions following libtorch's implementation.
+This allows for more semantic clarity in tensor operations by providing
+meaningful names to tensor dimensions.
 
-Implementation Details:
-- Accept 3D input tensors (seq_len, batch_size, embed_dim)
-- Handle dimension transformations internally (3D → 4D → 3D)
-- Support configurable number of attention heads
-- Match PyTorch's dimension conventions
+Core Implementation:
+1. Named Dimensions Infrastructure
+- Add Dimname type with support for basic and wildcard names
+- Implement C++ wrappers for libtorch's named tensor functionality
+- Add memory management and proper finalizer handling for dimension names
 
-Core Changes:
-- Add MultiHeadAttention function in functional.cc
-- Add basic test case in attention_test.go
-- Handle error cases using exception_str pattern
+2. Tensor Methods
+- Add SetNames method to assign names to tensor dimensions
+- Add Names method to retrieve current dimension names
+- Ensure proper memory handling between C++ and Go layers
+
+3. Core Features
+- Support for basic dimension names
+- Support for wildcard dimensions ("*")
+- Proper dimension name validation
+- Memory-safe handling of dimension names
 
 Testing:
-- Verify correct shape transformations
-- Validate output dimensions
-- Basic functionality test with random inputs
+- Basic dimension name creation and validation
+- 2D tensor dimension naming
+- 3D tensor dimension naming
+- Empty tensor dimension naming
+- Wildcard dimension support
+- Memory management verification
 
-Next Steps:
-- Add masking support tests
-- Add dropout tests
-- Add variable sequence length tests
-- Add GPU support
-- Implement attention optimizations
+Technical Details:
+- Integration with libtorch's at::Dimname system
+- Proper C++/Go boundary handling through cgotorch
+- Memory safety through Go finalizers
+- Consistent error handling through MustNil pattern
 
-Related to PyTorch upgrade to 2.5.1
+Note: Named tensors are marked as experimental in libtorch, and this
+implementation maintains compatibility with that status while providing
+a stable API for Go users.
+
+Example usage:
+```go
+tensor := torch.NewTensor([][]float32{{1, 2}, {3, 4}})
+batch := torch.NewDimname("batch", false)
+features := torch.NewDimname("features", false)
+namedTensor := tensor.SetNames(batch, features)
