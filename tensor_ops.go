@@ -716,3 +716,39 @@ func CatOut(tensors []Tensor, dim int64, out Tensor) Tensor {
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
 }
+
+// CatWithNames concatenates the given sequence of tensors along the named dimension
+// CatWithNames concatenates the given sequence of tensors along the named dimension
+func CatWithNames(tensors []Tensor, dim Dimname) Tensor {
+	var t C.Tensor
+	CT := make([]C.Tensor, len(tensors))
+	for i, tensor := range tensors {
+		CT[i] = C.Tensor(*tensor.T)
+	}
+	MustNil(unsafe.Pointer(C.CatWithNames(
+		(*C.Tensor)(unsafe.Pointer(&CT[0])),
+		C.int64_t(len(CT)),
+		dim.dimname, // Remove the dereferencing
+		&t,
+	)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// CatWithNamesOut concatenates tensors along named dimension with output tensor
+func CatWithNamesOut(tensors []Tensor, dim Dimname, out Tensor) Tensor {
+	var t C.Tensor
+	CT := make([]C.Tensor, len(tensors))
+	for i, tensor := range tensors {
+		CT[i] = C.Tensor(*tensor.T)
+	}
+	MustNil(unsafe.Pointer(C.CatWithNamesOut(
+		(*C.Tensor)(unsafe.Pointer(&CT[0])),
+		C.int64_t(len(CT)),
+		dim.dimname, // Remove the dereferencing
+		C.Tensor(*out.T),
+		&t,
+	)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
