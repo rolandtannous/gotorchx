@@ -118,6 +118,46 @@ const char *SetTensorDimnames(Tensor tensor, Dimname* names, int64_t num_names);
 const char *GetTensorDimnames(Tensor tensor, Dimname** names, int64_t* num_names);
 const char *DimnameToString(Dimname dimname, const char** result);
 
+
+// Reduction Operations
+// / Max without dimension
+const char *Max(Tensor input, Tensor *result);
+
+// Max along dimension
+const char *MaxDim(Tensor input, int64_t dim, int8_t keepdim, Tensor *values, Tensor *indices);
+
+// Min without dimension
+const char *Min(Tensor input, Tensor *result);
+
+// Min along dimension
+const char *MinDim(Tensor input, int64_t dim, int8_t keepdim,Tensor *values, Tensor *indices);
+
+// Element-wise operations
+const char *MaxElementwise(Tensor a, Tensor other, Tensor *result);
+const char *MinElementwise(Tensor a, Tensor other, Tensor *result);
+
+// Out variants
+const char *MaxElementwiseOut(Tensor a, Tensor other, Tensor out, Tensor *result);
+const char *MinElementwiseOut(Tensor a, Tensor other, Tensor out, Tensor *result);
+
+
+// Max/Min dimension out variants
+const char *MaxDimOut(Tensor input, int64_t dim, int8_t keepdim,
+                     Tensor values, Tensor indices,
+                     Tensor *result_values, Tensor *result_indices);
+const char *MinDimOut(Tensor input, int64_t dim, int8_t keepdim,
+                     Tensor values, Tensor indices,
+                     Tensor *result_values, Tensor *result_indices);
+
+// Product reduction over all elements
+const char *Prod(Tensor input, Tensor *result);
+
+// Product reduction along dimension
+const char *ProdDim(Tensor input, int64_t dim, int8_t keepdim, Tensor *result);
+// Prod out variants
+const char *ProdOut(Tensor input, Tensor out, Tensor *result);
+const char *ProdDimOut(Tensor input, int64_t dim, int8_t keepdim, Tensor out, Tensor *result);
+
 // Add to the existing declarations
 // Change from double to float
 #ifdef __cplusplus

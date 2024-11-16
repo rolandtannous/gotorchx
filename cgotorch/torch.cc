@@ -748,3 +748,159 @@ const char *DimnameToString(Dimname dimname, const char** result) {
         return exception_str(e.what());
     }
 }
+
+
+// Reduction operations
+
+// Add to cgotorch/torch.cc
+
+const char *Max(Tensor input, Tensor *result) {
+    try {
+        auto output = at::max(*input);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MaxDim(Tensor input, int64_t dim, int8_t keepdim,
+                  Tensor *values, Tensor *indices) {
+    try {
+        auto results = at::max(*input, dim, (bool)keepdim);
+        *values = new at::Tensor(std::get<0>(results));
+        *indices = new at::Tensor(std::get<1>(results));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Min(Tensor input, Tensor *result) {
+    try {
+        auto output = at::min(*input);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MinDim(Tensor input, int64_t dim, int8_t keepdim,
+                  Tensor *values, Tensor *indices) {
+    try {
+        auto results = at::min(*input, dim, (bool)keepdim);
+        *values = new at::Tensor(std::get<0>(results));
+        *indices = new at::Tensor(std::get<1>(results));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *Prod(Tensor input, Tensor *result) {
+    try {
+        auto output = at::prod(*input);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *ProdDim(Tensor input, int64_t dim, int8_t keepdim, Tensor *result) {
+    try {
+        auto output = at::prod(*input, dim, (bool)keepdim);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MaxElementwise(Tensor a, Tensor other, Tensor *result) {
+    try {
+        auto output = at::max(*a, *other);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MinElementwise(Tensor a, Tensor other, Tensor *result) {
+    try {
+        auto output = at::min(*a, *other);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MaxElementwiseOut(Tensor a, Tensor other, Tensor out, Tensor *result) {
+    try {
+        auto output = at::max_out(*out, *a, *other);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MinElementwiseOut(Tensor a, Tensor other, Tensor out, Tensor *result) {
+    try {
+        auto output = at::min_out(*out, *a, *other);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+
+const char *MaxDimOut(Tensor input, int64_t dim, int8_t keepdim,
+                     Tensor values, Tensor indices,
+                     Tensor *result_values, Tensor *result_indices) {
+    try {
+        auto results = at::max_out(*values, *indices, *input, dim, (bool)keepdim);
+        *result_values = new at::Tensor(std::get<0>(results));
+        *result_indices = new at::Tensor(std::get<1>(results));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *MinDimOut(Tensor input, int64_t dim, int8_t keepdim,
+                     Tensor values, Tensor indices,
+                     Tensor *result_values, Tensor *result_indices) {
+    try {
+        auto results = at::min_out(*values, *indices, *input, dim, (bool)keepdim);
+        *result_values = new at::Tensor(std::get<0>(results));
+        *result_indices = new at::Tensor(std::get<1>(results));
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *ProdOut(Tensor input, Tensor out, Tensor *result) {
+    try {
+        auto output = at::prod_out(*out, *input);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
+
+const char *ProdDimOut(Tensor input, int64_t dim, int8_t keepdim, Tensor out, Tensor *result) {
+    try {
+        auto output = at::prod_out(*out, *input, dim, (bool)keepdim);
+        *result = new at::Tensor(output);
+        return nullptr;
+    } catch (const std::exception &e) {
+        return exception_str(e.what());
+    }
+}
