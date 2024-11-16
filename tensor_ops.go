@@ -1,5 +1,6 @@
 package gotorch
 
+// #include <stdlib.h>
 // #cgo CFLAGS: -I ${SRCDIR}
 // #cgo LDFLAGS: -L ${SRCDIR}/cgotorch -Wl,-rpath ${SRCDIR}/cgotorch -lcgotorch
 // #cgo LDFLAGS: -L ${SRCDIR}/cgotorch/libtorch/lib -Wl,-rpath ${SRCDIR}/cgotorch/libtorch/lib -lc10 -ltorch -ltorch_cpu
@@ -751,4 +752,203 @@ func CatWithNamesOut(tensors []Tensor, dim Dimname, out Tensor) Tensor {
 	)))
 	SetTensorFinalizer((*unsafe.Pointer)(&t))
 	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Reduction operations
+// Add to tensor_ops.go
+
+// Max returns the maximum value of all elements in the input tensor
+func Max(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Max(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Max returns the maximum value of all elements in the input tensor
+func (a Tensor) Max() Tensor {
+	return Max(a)
+}
+
+// MaxDim returns a tuple of (maximum values, indices) along the given dimension
+func MaxDim(input Tensor, dim int64, keepdim bool) (Tensor, Tensor) {
+	var values, indices C.Tensor
+	k := C.int8_t(0)
+	if keepdim {
+		k = 1
+	}
+	MustNil(unsafe.Pointer(C.MaxDim(
+		C.Tensor(*input.T),
+		C.int64_t(dim),
+		C.int8_t(k),
+		&values,
+		&indices)))
+	SetTensorFinalizer((*unsafe.Pointer)(&values))
+	SetTensorFinalizer((*unsafe.Pointer)(&indices))
+	return Tensor{(*unsafe.Pointer)(&values)}, Tensor{(*unsafe.Pointer)(&indices)}
+}
+
+// MaxDim returns a tuple of (maximum values, indices) along the given dimension
+func (a Tensor) MaxDim(dim int64, keepdim bool) (Tensor, Tensor) {
+	return MaxDim(a, dim, keepdim)
+}
+
+// Min returns the minimum value of all elements in the input tensor
+func Min(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Min(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Min returns the minimum value of all elements in the input tensor
+func (a Tensor) Min() Tensor {
+	return Min(a)
+}
+
+// MinDim returns a tuple of (minimum values, indices) along the given dimension
+func MinDim(input Tensor, dim int64, keepdim bool) (Tensor, Tensor) {
+	var values, indices C.Tensor
+	k := C.int8_t(0)
+	if keepdim {
+		k = C.int8_t(1)
+	}
+	MustNil(unsafe.Pointer(C.MinDim(
+		C.Tensor(*input.T),
+		C.int64_t(dim),
+		k,
+		&values,
+		&indices)))
+	SetTensorFinalizer((*unsafe.Pointer)(&values))
+	SetTensorFinalizer((*unsafe.Pointer)(&indices))
+	return Tensor{(*unsafe.Pointer)(&values)}, Tensor{(*unsafe.Pointer)(&indices)}
+}
+
+// MinDim returns a tuple of (minimum values, indices) along the given dimension
+func (a Tensor) MinDim(dim int64, keepdim bool) (Tensor, Tensor) {
+	return MinDim(a, dim, keepdim)
+}
+
+// MaxElementwise returns element-wise maximum of two tensors
+func MaxElementwise(a, other Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MaxElementwise(C.Tensor(*a.T), C.Tensor(*other.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MaxElementwise returns element-wise maximum of two tensors
+func (a Tensor) MaxElementwise(other Tensor) Tensor {
+	return MaxElementwise(a, other)
+}
+
+// MinElementwise returns element-wise minimum of two tensors
+func MinElementwise(a, other Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MinElementwise(C.Tensor(*a.T), C.Tensor(*other.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MinElementwise returns element-wise minimum of two tensors
+func (a Tensor) MinElementwise(other Tensor) Tensor {
+	return MinElementwise(a, other)
+}
+
+// MaxElementwiseOut performs element-wise maximum and stores result in out
+func (a Tensor) MaxElementwiseOut(other, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MaxElementwiseOut(
+		C.Tensor(*a.T),
+		C.Tensor(*other.T),
+		C.Tensor(*out.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// MaxElementwiseOut performs element-wise maximum and stores result in out
+
+// MinElementwiseOut performs element-wise minimum and stores result in out
+func (a Tensor) MinElementwiseOut(other, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.MinElementwiseOut(
+		C.Tensor(*a.T),
+		C.Tensor(*other.T),
+		C.Tensor(*out.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Prod returns the product of all elements in the input tensor
+func Prod(input Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.Prod(C.Tensor(*input.T), &t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// Prod returns the product of all elements in the input tensor
+func (a Tensor) Prod() Tensor {
+	return Prod(a)
+}
+
+// ProdDim returns the product of all elements along the given dimension
+func ProdDim(input Tensor, dim int64, keepdim bool) Tensor {
+	var t C.Tensor
+	k := C.int8_t(0)
+	if keepdim {
+		k = C.int8_t(1)
+	}
+	MustNil(unsafe.Pointer(C.ProdDim(
+		C.Tensor(*input.T),
+		C.int64_t(dim),
+		k,
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// ProdDim returns the product of all elements along the given dimension
+func (a Tensor) ProdDim(dim int64, keepdim bool) Tensor {
+	return ProdDim(a, dim, keepdim)
+}
+
+// ProdOut returns the product of all elements in the input tensor and stores the result in out
+func ProdOut(input, out Tensor) Tensor {
+	var t C.Tensor
+	MustNil(unsafe.Pointer(C.ProdOut(
+		C.Tensor(*input.T),
+		C.Tensor(*out.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// ProdOut returns the product of all elements in the input tensor and stores the result in out
+func (a Tensor) ProdOut(out Tensor) Tensor {
+	return ProdOut(a, out)
+}
+
+// ProdDimOut returns the product of all elements along the given dimension and stores the result in out
+func ProdDimOut(input Tensor, dim int64, keepdim bool, out Tensor) Tensor {
+	var t C.Tensor
+	k := C.int8_t(0)
+	if keepdim {
+		k = C.int8_t(1)
+	}
+	MustNil(unsafe.Pointer(C.ProdDimOut(
+		C.Tensor(*input.T),
+		C.int64_t(dim),
+		k,
+		C.Tensor(*out.T),
+		&t)))
+	SetTensorFinalizer((*unsafe.Pointer)(&t))
+	return Tensor{(*unsafe.Pointer)(&t)}
+}
+
+// ProdDimOut returns the product of all elements along the given dimension and stores the result in out
+func (a Tensor) ProdDimOut(dim int64, keepdim bool, out Tensor) Tensor {
+	return ProdDimOut(a, dim, keepdim, out)
 }

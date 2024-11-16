@@ -1162,3 +1162,393 @@ func TestCatWithNames(t *testing.T) {
 		assert.Equal(t, "features", names[1].String())
 	})
 }
+
+// Reduce operations
+// Add to tensor_ops_test.go
+
+// Add to tensor_ops_test.go
+
+func TestMax(t *testing.T) {
+	// Test cases for Max (reduction over entire tensor)
+	t.Run("basic max reduction", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5})
+		max := tensor.Max()
+		if max.Item().(float32) != 5 {
+			t.Errorf("Expected max 5, got %v", max.Item())
+		}
+	})
+
+	t.Run("2D tensor max", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		max := tensor.Max()
+		if max.Item().(float32) != 6 {
+			t.Errorf("Expected max 6, got %v", max.Item())
+		}
+	})
+
+	t.Run("negative values", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{-1, -2, -3, -4, -5})
+		max := tensor.Max()
+		if max.Item().(float32) != -1 {
+			t.Errorf("Expected max -1, got %v", max.Item())
+		}
+	})
+
+	t.Run("single element", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{42})
+		max := tensor.Max()
+		if max.Item().(float32) != 42 {
+			t.Errorf("Expected max 42, got %v", max.Item())
+		}
+	})
+}
+
+func TestMaxDim(t *testing.T) {
+	t.Run("max along dim 0", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MaxDim(0, false)
+
+		expectedValues := torch.NewTensor([]float32{4, 5, 6})
+		expectedIndices := torch.NewTensor([]int64{1, 1, 1})
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	t.Run("max along dim 1", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MaxDim(1, false)
+
+		expectedValues := torch.NewTensor([]float32{3, 6})
+		expectedIndices := torch.NewTensor([]int64{2, 2})
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	t.Run("max with keepdim", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MaxDim(1, true)
+
+		// Check shape with keepdim
+		if len(values.Shape()) != 2 || values.Shape()[1] != 1 {
+			t.Errorf("Expected shape [2,1], got %v", values.Shape())
+		}
+
+		expectedValues := torch.NewTensor([]float32{3, 6}).Reshape(2, 1)
+		expectedIndices := torch.NewTensor([]int64{2, 2}).Reshape(2, 1)
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	t.Run("3D tensor max", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6, 7, 8}).Reshape(2, 2, 2)
+		values, indices := tensor.MaxDim(1, false)
+
+		expectedValues := torch.NewTensor([]float32{3, 4, 7, 8}).Reshape(2, 2)
+		expectedIndices := torch.NewTensor([]int64{1, 1, 1, 1}).Reshape(2, 2)
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	// Invalid dimension test remains the same
+}
+
+func TestMin(t *testing.T) {
+	t.Run("basic min reduction", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5})
+		min := tensor.Min()
+		if min.Item().(float32) != 1 {
+			t.Errorf("Expected min 1, got %v", min.Item())
+		}
+	})
+
+	t.Run("2D tensor min", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		min := tensor.Min()
+		if min.Item().(float32) != 1 {
+			t.Errorf("Expected min 1, got %v", min.Item())
+		}
+	})
+
+	t.Run("negative values", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{-1, -2, -3, -4, -5})
+		min := tensor.Min()
+		if min.Item().(float32) != -5 {
+			t.Errorf("Expected min -5, got %v", min.Item())
+		}
+	})
+}
+
+func TestMinDim(t *testing.T) {
+	t.Run("min along dim 0", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MinDim(0, false)
+
+		expectedValues := torch.NewTensor([]float32{1, 2, 3})
+		expectedIndices := torch.NewTensor([]int64{0, 0, 0})
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	t.Run("min along dim 1", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MinDim(1, false)
+
+		expectedValues := torch.NewTensor([]float32{1, 4})
+		expectedIndices := torch.NewTensor([]int64{0, 0})
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+
+	t.Run("min with keepdim", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		values, indices := tensor.MinDim(1, true)
+
+		if len(values.Shape()) != 2 || values.Shape()[1] != 1 {
+			t.Errorf("Expected shape [2,1], got %v", values.Shape())
+		}
+
+		expectedValues := torch.NewTensor([]float32{1, 4}).Reshape(2, 1)
+		expectedIndices := torch.NewTensor([]int64{0, 0}).Reshape(2, 1)
+
+		if !torch.AllClose(values, expectedValues) {
+			t.Errorf("Expected values %s, got %s", expectedValues.String(), values.String())
+		}
+		if !torch.Equal(indices, expectedIndices) {
+			t.Errorf("Expected indices %s, got %s", expectedIndices.String(), indices.String())
+		}
+	})
+}
+
+func TestProd(t *testing.T) {
+	t.Run("basic prod reduction", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4})
+		prod := tensor.Prod()
+		if prod.Item().(float32) != 24 { // 1 * 2 * 3 * 4 = 24
+			t.Errorf("Expected product 24, got %v", prod.Item())
+		}
+	})
+
+	t.Run("2D tensor prod", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4}).Reshape(2, 2)
+		prod := tensor.Prod()
+		if prod.Item().(float32) != 24 {
+			t.Errorf("Expected product 24, got %v", prod.Item())
+		}
+	})
+
+	t.Run("prod with zeros", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 0, 4})
+		prod := tensor.Prod()
+		if prod.Item().(float32) != 0 {
+			t.Errorf("Expected product 0, got %v", prod.Item())
+		}
+	})
+}
+
+func TestElementwiseMaxMin(t *testing.T) {
+	t.Run("element-wise max", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 4, 3, 8})
+		b := torch.NewTensor([]float32{2, 3, 5, 7})
+		result := a.MaxElementwise(b)
+
+		expected := torch.NewTensor([]float32{2, 4, 5, 8})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("element-wise min", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 4, 3, 8})
+		b := torch.NewTensor([]float32{2, 3, 5, 7})
+		result := a.MinElementwise(b)
+
+		expected := torch.NewTensor([]float32{1, 3, 3, 7})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("element-wise max with broadcasting", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3, 4}).Reshape(2, 2)
+		b := torch.NewTensor([]float32{2, 2}).Reshape(1, 2)
+		result := a.MaxElementwise(b)
+
+		expected := torch.NewTensor([]float32{2, 2, 3, 4}).Reshape(2, 2)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("element-wise min with broadcasting", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 2, 3, 4}).Reshape(2, 2)
+		b := torch.NewTensor([]float32{2, 2}).Reshape(1, 2)
+		result := a.MinElementwise(b)
+
+		expected := torch.NewTensor([]float32{1, 2, 2, 2}).Reshape(2, 2)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+}
+
+func TestMaxMinOut(t *testing.T) {
+	t.Run("max elementwise out", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 4, 3, 8})
+		b := torch.NewTensor([]float32{2, 3, 5, 7})
+		out := torch.NewTensor([]float32{0, 0, 0, 0})
+		result := a.MaxElementwiseOut(b, out)
+
+		expected := torch.NewTensor([]float32{2, 4, 5, 8})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+		// Verify out tensor was modified
+		if !torch.AllClose(out, expected) {
+			t.Errorf("Out tensor not modified correctly. Expected %s, got %s",
+				expected.String(), out.String())
+		}
+	})
+
+	t.Run("min elementwise out", func(t *testing.T) {
+		a := torch.NewTensor([]float32{1, 4, 3, 8})
+		b := torch.NewTensor([]float32{2, 3, 5, 7})
+		out := torch.NewTensor([]float32{0, 0, 0, 0})
+		result := a.MinElementwiseOut(b, out)
+
+		expected := torch.NewTensor([]float32{1, 3, 3, 7})
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+		// Verify out tensor was modified
+		if !torch.AllClose(out, expected) {
+			t.Errorf("Out tensor not modified correctly. Expected %s, got %s",
+				expected.String(), out.String())
+		}
+	})
+}
+
+func TestProdDim(t *testing.T) {
+	t.Run("prod along dim 0", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		result := tensor.ProdDim(0, false)
+
+		expected := torch.NewTensor([]float32{4, 10, 18}) // [1*4, 2*5, 3*6]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("prod along dim 1", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		result := tensor.ProdDim(1, false)
+
+		expected := torch.NewTensor([]float32{6, 120}) // [1*2*3, 4*5*6]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("prod with keepdim", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		result := tensor.ProdDim(1, true)
+
+		if len(result.Shape()) != 2 || result.Shape()[1] != 1 {
+			t.Errorf("Expected shape [2,1], got %v", result.Shape())
+		}
+
+		expected := torch.NewTensor([]float32{6, 120}).Reshape(2, 1)
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+
+	t.Run("prod with zeros", func(t *testing.T) {
+		tensor := torch.NewTensor([]float32{1, 0, 3, 4, 0, 6}).Reshape(2, 3)
+		result := tensor.ProdDim(1, false)
+
+		expected := torch.NewTensor([]float32{0, 0}) // [1*0*3, 4*0*6]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+	})
+}
+
+func TestProdOut(t *testing.T) {
+	t.Run("basic prod out", func(t *testing.T) {
+		input := torch.NewTensor([]float32{1, 2, 3, 4})
+		// Create a scalar tensor with empty shape for output
+		out := input.Prod() // This will give us a tensor with the correct scalar shape
+		result := input.ProdOut(out)
+
+		expected := torch.NewTensor([]float32{24}) // 1 * 2 * 3 * 4 = 24
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+		// Verify out tensor was modified
+		if !torch.AllClose(out, expected) {
+			t.Errorf("Out tensor not modified correctly. Expected %s, got %s",
+				expected.String(), out.String())
+		}
+	})
+
+	// Rest of the test cases remain the same
+	t.Run("prod dim out", func(t *testing.T) {
+		input := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		out := torch.NewTensor([]float32{0, 0}) // Output shape matches reduction result
+		result := input.ProdDimOut(1, false, out)
+
+		expected := torch.NewTensor([]float32{6, 120}) // [1*2*3, 4*5*6]
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+		if !torch.AllClose(out, expected) {
+			t.Errorf("Out tensor not modified correctly. Expected %s, got %s",
+				expected.String(), out.String())
+		}
+	})
+
+	t.Run("prod dim out with keepdim", func(t *testing.T) {
+		input := torch.NewTensor([]float32{1, 2, 3, 4, 5, 6}).Reshape(2, 3)
+		out := torch.NewTensor([]float32{0, 0}).Reshape(2, 1) // Output shape matches keepdim result
+		result := input.ProdDimOut(1, true, out)
+
+		expected := torch.NewTensor([]float32{6, 120}).Reshape(2, 1) // [1*2*3, 4*5*6] with keepdim
+		if !torch.AllClose(result, expected) {
+			t.Errorf("Expected %s, got %s", expected.String(), result.String())
+		}
+		if !torch.AllClose(out, expected) {
+			t.Errorf("Out tensor not modified correctly. Expected %s, got %s",
+				expected.String(), out.String())
+		}
+	})
+}
