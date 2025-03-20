@@ -1,7 +1,7 @@
 # GoTorchX
 
 
-GoTorchX implements PyTorch high-level APIs, including modules and functionals, in idiomatic Go. This enables deep learning programming in Go and Go+. We are following the original design and philosophy of the gotorch package while exploring architectural changes that could improve Go's performance with PyTorch. This project is the revival and continued development of the original GoTorch project.
+GoTorchX implements PyTorch high-level APIs, including modules and functionals, in idiomatic Go. This enables deep learning programming in Go and Go+. We are following the original design and philosophy of the gotorch package while exploring architectural changes that could improve Go's performance with PyTorch. This project is the revival and continued development of the original [GoTorch project](https://github.com/wangkuiyi/gotorch).
 
 ## Attribution
 
