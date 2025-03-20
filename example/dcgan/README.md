@@ -43,7 +43,7 @@ brew install gnu-tar  # Use gtar instead tar in the above command.
 ## Build the Sample
 
 Please follow the
-[CONTRIBUTING.md](https://github.com/wangkuiyi/gotorch/blob/develop/CONTRIBUTING.md)
+[CONTRIBUTING.md](https://github.com/rolandtannous/gotorchx/blob/develop/CONTRIBUTING.md)
 guide to build.
 
 ```bash

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	torch "github.com/wangkuiyi/gotorch"
+	torch "github.com/rolandtannous/gotorchx"
 )
 
 func TestMultiHeadAttention(t *testing.T) {

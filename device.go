@@ -68,7 +68,7 @@ func init() {
 	// result, a GoTorch program will occupy much RAM (the TLSs) and create many
 	// threads (the computation threads). (This is an inherent problem of
 	// libtorch, it also exists in C++. For a C++ example, See
-	// https://github.com/wangkuiyi/gotorch/issues/331)
+	// https://github.com/rolandtannous/gotorchx/issues/331)
 	// In order to alleviate the problem, we have to limit the default threads
 	// number of OMP in GoTorch and lock the main goroutine to a fixed OS
 	// thread to avoid migration.
@@ -77,7 +77,7 @@ func init() {
 	// Avoid creating too many threads: the original default setting of
 	// OMP_NUM_THREADS (defaults to the core number in libtorch) may degrade
 	// performance on GPUs because too many threads will increase the overhead
-	// of context switching. See https://github.com/wangkuiyi/gotorch/issues/321
+	// of context switching. See https://github.com/rolandtannous/gotorchx/issues/321
 	// for details.
 	if os.Getenv("OMP_NUM_THREADS") == "" && os.Getenv("MKL_NUM_THREADS") == "" {
 		SetNumThreads(int32(runtime.NumCPU()) / 2)
@@ -85,6 +85,6 @@ func init() {
 
 	// Prevent Cgo call from migrating to another system thread, hence the TLS
 	// cache in libtorch would not take too much RAM.
-	// See https://github.com/wangkuiyi/gotorch/issues/273 for details.
+	// See https://github.com/rolandtannous/gotorchx/issues/273 for details.
 	runtime.LockOSThread()
 }

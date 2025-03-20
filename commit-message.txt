@@ -1,41 +1,12 @@
-feat: Implement named dimension support for tensor concatenation
+refactor: complete package rebranding and documentation overhaul
 
-Add support for tensor concatenation using named dimensions (cat.names),
-extending the existing concatenation functionality with semantic dimension naming.
-
-Core Implementation:
-1. Named Concatenation Functions
-- Add CatWithNames for concatenating tensors along named dimensions
-- Add CatWithNamesOut for memory-efficient named dimension concatenation
-- Implement proper C++ wrappers for libtorch's named tensor cat operations
-
-2. Integration with Named Dimensions
-- Maintain dimension name propagation during concatenation
-- Preserve name ordering in resulting tensors
-- Handle dimension name validation and matching
-
-Testing:
-- Basic named dimension concatenation verification
-- Shape and value correctness testing
-- Dimension name preservation testing
-- Multiple dimension concatenation scenarios
-- Explicit value verification without relying on AllClose
-- Individual element access validation
-
-Technical Details:
-- Direct integration with libtorch's at::cat operations
-- Proper handling of C++/Go type conversions for named dimensions
-- Memory management for named tensor operations
-- Explicit testing without workarounds for named tensor limitations
-
-Example usage:
-```go
-a := tensor.SetNames(
-    NewDimname("batch", false),
-    NewDimname("features", false),
-)
-b := tensor.SetNames(
-    NewDimname("batch", false),
-    NewDimname("features", false),
-)
-result := CatWithNames([]Tensor{a, b}, NewDimname("batch", false))
+- Renamed package to gotorchx across entire codebase
+- Updated all internal links and references to new package name
+- Added proper copyright attributions and notices
+- Implemented new LICENSE file
+- Created dedicated copyright notice file
+- Revamped README with:
+  * Updated project branding
+  * New roadmap section
+  * Technical considerations documentation
+  * Improved project structure overview

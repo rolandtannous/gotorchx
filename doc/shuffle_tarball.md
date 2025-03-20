@@ -72,7 +72,7 @@ divide-and-merge strategy -- `tarball_divide` and `tarball_merge`.
 To install them, we need the Go compiler and run the following commands.
 
 ```bash
-go get github.com/wangkuiyi/gotorch/tool/...
+go get github.com/rolandtannous/gotorchx/tool/...
 ```
 
 We can then find the executable files in `$GOPATH/bin`.

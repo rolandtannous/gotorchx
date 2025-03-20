@@ -4,7 +4,7 @@
 
 To run the GoTorch version of MNIST training for five epochs, type the following
 command.  You need to follow the development
-[document](https://github.com/wangkuiyi/gotorch/blob/develop/CONTRIBUTING.md)
+[document](https://github.com/rolandtannous/gotorchx/blob/develop/CONTRIBUTING.md)
 to install the required software, including the Go compiler.
 
 ```bash
@@ -50,7 +50,7 @@ The throughput: 4236.326723046286 samples/sec
 $ /usr/bin/time go test -run TrainMNIST
 2020/08/12 10:52:31 Throughput: 9282.386087 samples/sec
 PASS
-ok      github.com/wangkuiyi/gotorch    33.026s
+ok      github.com/rolandtannous/gotorchx    33.026s
        34.27 real        97.30 user       263.18 sys
 
 $ make -C benchmark && /usr/bin/time ./benchmark/mnist
@@ -90,7 +90,7 @@ Diving into details, we found that the libtorch installed from the
 OpenMP to use all CPU cores.
 
 We verified this fact in the additional
-[trial](https://github.com/wangkuiyi/gotorch/pull/105#issuecomment-672336636),
+[trial](https://github.com/rolandtannous/gotorchx/pull/105#issuecomment-672336636),
 where we force both the GoTorch and PyTorch version to use only one CPU core,
 they have similar throughput -- in particular, the GoTorch version is 22\%
 faster than the PyTorch version.
@@ -132,7 +132,7 @@ $ go test -cpuprofile cpu.prof -memprofile mem.prof -v -run TrainMLPUsingMNIST
 2020/08/19 14:04:53 Throughput: 13678.129358 samples/sec
 --- PASS: ExampleTrainMLPUsingMNIST (9.02s)
 PASS
-ok      github.com/wangkuiyi/gotorch    9.466s
+ok      github.com/rolandtannous/gotorchx    9.466s
 ```
 
 ```

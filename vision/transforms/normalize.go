@@ -3,7 +3,7 @@ package transforms
 import (
 	"fmt"
 
-	torch "github.com/wangkuiyi/gotorch"
+	torch "github.com/rolandtannous/gotorchx"
 )
 
 // NormalizeTransformer corresponds to torchvision.transforms.html#Normalize. It

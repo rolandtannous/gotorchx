@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wangkuiyi/gotorch/vision"
+	"github.com/rolandtannous/gotorchx/vision"
 )
 
 func synthesizeImages(w io.Writer) []string {

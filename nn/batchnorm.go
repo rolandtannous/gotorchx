@@ -1,9 +1,9 @@
 package nn
 
 import (
-	torch "github.com/wangkuiyi/gotorch"
-	"github.com/wangkuiyi/gotorch/nn/functional"
-	"github.com/wangkuiyi/gotorch/nn/initializer"
+	torch "github.com/rolandtannous/gotorchx"
+	"github.com/rolandtannous/gotorchx/nn/functional"
+	"github.com/rolandtannous/gotorchx/nn/initializer"
 )
 
 // BatchNorm2dModule torch.nn.BatchNorm2d

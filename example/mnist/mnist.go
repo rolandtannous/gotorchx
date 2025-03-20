@@ -10,12 +10,12 @@ import (
 	"strings"
 	"time"
 
-	torch "github.com/wangkuiyi/gotorch"
-	F "github.com/wangkuiyi/gotorch/nn/functional"
-	"github.com/wangkuiyi/gotorch/nn/initializer"
-	"github.com/wangkuiyi/gotorch/vision/imageloader"
-	"github.com/wangkuiyi/gotorch/vision/models"
-	"github.com/wangkuiyi/gotorch/vision/transforms"
+	torch "github.com/rolandtannous/gotorchx"
+	F "github.com/rolandtannous/gotorchx/nn/functional"
+	"github.com/rolandtannous/gotorchx/nn/initializer"
+	"github.com/rolandtannous/gotorchx/vision/imageloader"
+	"github.com/rolandtannous/gotorchx/vision/models"
+	"github.com/rolandtannous/gotorchx/vision/transforms"
 	"gocv.io/x/gocv"
 )
 
@@ -84,7 +84,12 @@ func train(trainFn, testFn string, epochs int, save string) {
 			trainLoss = loss.Item().(float32)
 		}
 		throughput := float64(totalSamples) / time.Since(startTime).Seconds()
-		log.Printf("Train Epoch: %d, Loss: %.4f, throughput: %f samples/sec", epoch, trainLoss, throughput)
+		log.Printf(
+			"Train Epoch: %d, Loss: %.4f, throughput: %f samples/sec",
+			epoch,
+			trainLoss,
+			throughput,
+		)
 		test(net, testLoader)
 	}
 	saveModel(net, save)
@@ -92,8 +97,20 @@ func train(trainFn, testFn string, epochs int, save string) {
 
 // MNISTLoader returns a ImageLoader with MNIST training or testing tgz file
 func MNISTLoader(fn string, vocab map[string]int) *imageloader.ImageLoader {
-	trans := transforms.Compose(transforms.ToTensor(), transforms.Normalize([]float32{0.1307}, []float32{0.3081}))
-	loader, e := imageloader.New(fn, vocab, trans, 64, 64, time.Now().UnixNano(), torch.IsCUDAAvailable(), "gray")
+	trans := transforms.Compose(
+		transforms.ToTensor(),
+		transforms.Normalize([]float32{0.1307}, []float32{0.3081}),
+	)
+	loader, e := imageloader.New(
+		fn,
+		vocab,
+		trans,
+		64,
+		64,
+		time.Now().UnixNano(),
+		torch.IsCUDAAvailable(),
+		"gray",
+	)
 	if e != nil {
 		panic(e)
 	}

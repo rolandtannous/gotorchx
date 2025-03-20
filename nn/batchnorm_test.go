@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	torch "github.com/wangkuiyi/gotorch"
+	torch "github.com/rolandtannous/gotorchx"
 )
 
 func TestBatchNorm2d(t *testing.T) {

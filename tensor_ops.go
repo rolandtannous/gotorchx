@@ -13,7 +13,7 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/wangkuiyi/gotorch/variadic"
+	"github.com/rolandtannous/gotorchx/variadic"
 )
 
 // Add torch.add

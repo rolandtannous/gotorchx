@@ -214,8 +214,8 @@ Now, we can use the function ported from `torch.nn.functional` to
 `gotorch/nn/functional` in our application programs.
 
 ```go
-import torch "github.com/wangkuiyi/gotorch"
-import F "github.com/wangkuiyi/gotorch/nn/functional"
+import torch "github.com/rolandtannous/gotorchx"
+import F "github.com/rolandtannous/gotorchx/nn/functional"
 
 input := torch.RandN([]int64{32, 100}, false)
 weight := torch.RandN([]int64{100, 10}, true)

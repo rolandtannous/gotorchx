@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/wangkuiyi/gotorch/variadic"
+	"github.com/rolandtannous/gotorchx/variadic"
 )
 
 const (

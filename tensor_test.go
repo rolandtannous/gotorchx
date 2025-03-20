@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	torch "github.com/wangkuiyi/gotorch"
-	"github.com/wangkuiyi/gotorch/nn/initializer"
+	torch "github.com/rolandtannous/gotorchx"
+	"github.com/rolandtannous/gotorchx/nn/initializer"
 )
 
 func TestTensorDetach(t *testing.T) {

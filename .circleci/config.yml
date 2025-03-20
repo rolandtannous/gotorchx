@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: gotorch/gotorch
 
-    working_directory: /go/src/github.com/wangkuiyi/gotorch
+    working_directory: /go/src/github.com/rolandtannous/gotorchx
     steps:
       - checkout
       - run: pre-commit run -a

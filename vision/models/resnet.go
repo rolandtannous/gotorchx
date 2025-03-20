@@ -3,9 +3,9 @@ package models
 import (
 	"reflect"
 
-	torch "github.com/wangkuiyi/gotorch"
-	"github.com/wangkuiyi/gotorch/nn"
-	F "github.com/wangkuiyi/gotorch/nn/functional"
+	torch "github.com/rolandtannous/gotorchx"
+	"github.com/rolandtannous/gotorchx/nn"
+	F "github.com/rolandtannous/gotorchx/nn/functional"
 )
 
 // BasicBlockModule struct

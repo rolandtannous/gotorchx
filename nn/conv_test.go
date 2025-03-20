@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	torch "github.com/wangkuiyi/gotorch"
+	torch "github.com/rolandtannous/gotorchx"
 )
 
 // >>> c = torch.nn.Conv2d(16, 33, 3, 2, 0, 1, 1, True, "zeros")

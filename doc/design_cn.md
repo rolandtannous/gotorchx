@@ -146,8 +146,8 @@ func Linear(input, weight, bias torch.Tensor) torch.Tensor {
 再接下来，我们就可以在自己的应用程序中使用从`torch.nn.functional`移植到`gotorch/nn/functional`下的函数了。
 
 ```go
-import torch "github.com/wangkuiyi/gotorch"
-import F "github.com/wangkuiyi/gotorch/nn/functional"
+import torch "github.com/rolandtannous/gotorchx"
+import F "github.com/rolandtannous/gotorchx/nn/functional"
 
 input := torch.RandN([]int64{32, 100}, false)
 weight := torch.RandN([]int64{100, 10}, true)

@@ -9,9 +9,9 @@ import (
 	"runtime"
 	"sync"
 
-	torch "github.com/wangkuiyi/gotorch"
-	"github.com/wangkuiyi/gotorch/tool/tgz"
-	"github.com/wangkuiyi/gotorch/vision/transforms"
+	torch "github.com/rolandtannous/gotorchx"
+	"github.com/rolandtannous/gotorchx/tool/tgz"
+	"github.com/rolandtannous/gotorchx/vision/transforms"
 	"gocv.io/x/gocv"
 )
 

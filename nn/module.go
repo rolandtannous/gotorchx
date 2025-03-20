@@ -5,7 +5,7 @@ import (
 	"log"
 	"reflect"
 
-	torch "github.com/wangkuiyi/gotorch"
+	torch "github.com/rolandtannous/gotorchx"
 )
 
 // IModule is the interface of `Module`s

@@ -45,11 +45,11 @@ find ./valid | tar zxf validation.tgz -T -
 ## Build and Run the Sample
 
 Please follow
-[CONTRIBUTING.md](https://github.com/wangkuiyi/gotorch/blob/develop/CONTRIBUTING.md)
+[CONTRIBUTING.md](https://github.com/rolandtannous/gotorchx/blob/develop/CONTRIBUTING.md)
 to build the sample program.
 
 ```bash
-git clone https://github.com/wangkuiyi/gotorch
+git clone https://github.com/rolandtannous/gotorchx
 cd gotorch
 go generate ./...  # Build cgolibtorch
 go install ./...   # Build all sample programs

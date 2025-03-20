@@ -57,7 +57,7 @@ drwxr-x---  0 myleott myleott     0 Dec 10  2015 mnist_png/testing/2/
 `tarball_divide` 和 `tarball_merge`。 我们可以通过以下命令来安装它们：
 
 ```bash
-go get github.com/wangkuiyi/gotorch/tool/...
+go get github.com/rolandtannous/gotorchx/tool/...
 ```
 
 运行上述命令后，我们可以在 `$GOPATH/bin` 中找到这两个工具的二进制文件。

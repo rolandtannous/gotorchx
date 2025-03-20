@@ -9,12 +9,12 @@ import (
 	"os"
 	"time"
 
-	torch "github.com/wangkuiyi/gotorch"
-	F "github.com/wangkuiyi/gotorch/nn/functional"
-	"github.com/wangkuiyi/gotorch/nn/initializer"
-	"github.com/wangkuiyi/gotorch/vision/imageloader"
-	"github.com/wangkuiyi/gotorch/vision/models"
-	"github.com/wangkuiyi/gotorch/vision/transforms"
+	torch "github.com/rolandtannous/gotorchx"
+	F "github.com/rolandtannous/gotorchx/nn/functional"
+	"github.com/rolandtannous/gotorchx/nn/initializer"
+	"github.com/rolandtannous/gotorchx/vision/imageloader"
+	"github.com/rolandtannous/gotorchx/vision/models"
+	"github.com/rolandtannous/gotorchx/vision/transforms"
 )
 
 const logInterval = 10 // in iterations
@@ -87,13 +87,21 @@ func accuracy(output, target torch.Tensor, topk []int64) []float32 {
 	res := []float32{}
 	for _, k := range topk {
 		kt := torch.NewTensor(rangeI(k)).CopyTo(device)
-		correctK := correct.IndexSelect(0, kt).View(-1).CastTo(torch.Float).Sum(map[string]interface{}{"dim": 0, "keepDim": true})
+		correctK := correct.IndexSelect(0, kt).
+			View(-1).
+			CastTo(torch.Float).
+			Sum(map[string]interface{}{"dim": 0, "keepDim": true})
 		res = append(res, correctK.Item().(float32)*100/float32(mbSize))
 	}
 	return res
 }
 
-func imageNetLoader(fn string, vocab map[string]int, mbSize int, pinMemory, isTrain bool) *imageloader.ImageLoader {
+func imageNetLoader(
+	fn string,
+	vocab map[string]int,
+	mbSize int,
+	pinMemory, isTrain bool,
+) *imageloader.ImageLoader {
 	var trans *transforms.ComposeTransformer
 	if isTrain {
 		trans = transforms.Compose(
@@ -109,14 +117,27 @@ func imageNetLoader(fn string, vocab map[string]int, mbSize int, pinMemory, isTr
 			transforms.Normalize([]float32{0.485, 0.456, 0.406}, []float32{0.229, 0.224, 0.225}))
 	}
 
-	loader, e := imageloader.New(fn, vocab, trans, mbSize, mbSize*10, time.Now().UnixNano(), pinMemory, "rgb")
+	loader, e := imageloader.New(
+		fn,
+		vocab,
+		trans,
+		mbSize,
+		mbSize*10,
+		time.Now().UnixNano(),
+		pinMemory,
+		"rgb",
+	)
 	if e != nil {
 		log.Fatal(e)
 	}
 	return loader
 }
 
-func trainOneMinibatch(image, target torch.Tensor, model *models.ResnetModule, opt torch.Optimizer) (float32, float32, float32) {
+func trainOneMinibatch(
+	image, target torch.Tensor,
+	model *models.ResnetModule,
+	opt torch.Optimizer,
+) (float32, float32, float32) {
 	output := model.Forward(image)
 	loss := F.CrossEntropy(output, target, torch.Tensor{}, -100, "mean")
 	acc := accuracy(output, target, []int64{1, 5})
@@ -144,7 +165,16 @@ func validate(model *models.ResnetModule, loader *imageloader.ImageLoader, epoch
 		loss := F.CrossEntropy(output, label, torch.Tensor{}, -100, "mean").Item().(float32)
 		avgLoss.update(loss)
 		if iters%logInterval == 0 {
-			log.Printf("Test Iteration: %d, loss: %.4f(%.4f), acc1: %.4f(%.4f), acc5: %.4f(%.4f)", iters, loss, avgLoss.average, acc[0], avgAcc1.average, acc[1], avgAcc5.average)
+			log.Printf(
+				"Test Iteration: %d, loss: %.4f(%.4f), acc1: %.4f(%.4f), acc5: %.4f(%.4f)",
+				iters,
+				loss,
+				avgLoss.average,
+				acc[0],
+				avgAcc1.average,
+				acc[1],
+				avgAcc5.average,
+			)
 		}
 		iters++
 	}
@@ -180,7 +210,13 @@ func train(trainFn, testFn, label, save string, epochs int, pinMemory bool) {
 	weightDecay := 1e-4
 	optimizer := torch.SGD(lr, momentum, 0, weightDecay, false)
 	optimizer.AddParameters(model.Parameters())
-	log.Printf("mini-batch size: %d, initialize LR: %f, momentum: %f, weight decay: %f", mbSize, lr, momentum, weightDecay)
+	log.Printf(
+		"mini-batch size: %d, initialize LR: %f, momentum: %f, weight decay: %f",
+		mbSize,
+		lr,
+		momentum,
+		weightDecay,
+	)
 
 	for epoch := 0; epoch < epochs; epoch++ {
 		adjustLearningRate(optimizer, epoch, lr)
@@ -195,15 +231,31 @@ func train(trainFn, testFn, label, save string, epochs int, pinMemory bool) {
 		for trainLoader.Scan() {
 			data, label := trainLoader.Minibatch()
 			optimizer.ZeroGrad()
-			loss, acc1, acc5 := trainOneMinibatch(data.To(device, data.Dtype()), label.To(device, label.Dtype()), model, optimizer)
+			loss, acc1, acc5 := trainOneMinibatch(
+				data.To(device, data.Dtype()),
+				label.To(device, label.Dtype()),
+				model,
+				optimizer,
+			)
 			avgAcc1.update(acc1)
 			avgAcc5.update(acc5)
 			avgLoss.update(loss)
 			if iters%logInterval == 0 {
 				throughput := float64(data.Shape()[0]*logInterval) / time.Since(startTime).Seconds()
 				avgThroughput.update(float32(throughput))
-				log.Printf("Train Epoch: %d, Iteration: %d, loss:%.4f(%.4f), acc1: %.4f(%.4f), acc5:%.4f(%.4f), throughput: %.4f(%.4f) samples/sec",
-					epoch, iters, loss, avgLoss.average, acc1, avgAcc1.average, acc5, avgAcc5.average, throughput, avgThroughput.average)
+				log.Printf(
+					"Train Epoch: %d, Iteration: %d, loss:%.4f(%.4f), acc1: %.4f(%.4f), acc5:%.4f(%.4f), throughput: %.4f(%.4f) samples/sec",
+					epoch,
+					iters,
+					loss,
+					avgLoss.average,
+					acc1,
+					avgAcc1.average,
+					acc5,
+					avgAcc5.average,
+					throughput,
+					avgThroughput.average,
+				)
 				startTime = time.Now()
 			}
 			iters++

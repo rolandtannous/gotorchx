@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
-	torch "github.com/wangkuiyi/gotorch"
-	nn "github.com/wangkuiyi/gotorch/nn"
-	F "github.com/wangkuiyi/gotorch/nn/functional"
-	"github.com/wangkuiyi/gotorch/nn/initializer"
-	"github.com/wangkuiyi/gotorch/vision/imageloader"
-	"github.com/wangkuiyi/gotorch/vision/transforms"
+	torch "github.com/rolandtannous/gotorchx"
+	nn "github.com/rolandtannous/gotorchx/nn"
+	F "github.com/rolandtannous/gotorchx/nn/functional"
+	"github.com/rolandtannous/gotorchx/nn/initializer"
+	"github.com/rolandtannous/gotorchx/vision/imageloader"
+	"github.com/rolandtannous/gotorchx/vision/transforms"
 )
 
 var data = flag.String("data", "", "path to dataset")
@@ -100,7 +100,16 @@ func celebaLoader(data string, vocab map[string]int, mbSize int) *imageloader.Im
 		transforms.CenterCrop(imageSize),
 		transforms.ToTensor(),
 		transforms.Normalize([]float32{0.5, 0.5, 0.5}, []float32{0.5, 0.5, 0.5}))
-	loader, e := imageloader.New(data, vocab, trans, mbSize, mbSize*2, time.Now().UnixNano(), torch.IsCUDAAvailable(), "rgb")
+	loader, e := imageloader.New(
+		data,
+		vocab,
+		trans,
+		mbSize,
+		mbSize*2,
+		time.Now().UnixNano(),
+		torch.IsCUDAAvailable(),
+		"rgb",
+	)
 	if e != nil {
 		panic(e)
 	}

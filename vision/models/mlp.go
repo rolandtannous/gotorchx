@@ -1,8 +1,8 @@
 package models
 
 import (
-	torch "github.com/wangkuiyi/gotorch"
-	"github.com/wangkuiyi/gotorch/nn"
+	torch "github.com/rolandtannous/gotorchx"
+	"github.com/rolandtannous/gotorchx/nn"
 )
 
 // MLPModule represent a multilayer perceptron network

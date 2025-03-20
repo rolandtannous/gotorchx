@@ -47,7 +47,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/wangkuiyi/gotorch/tool/tgz"
+	"github.com/rolandtannous/gotorchx/tool/tgz"
 )
 
 func main() {

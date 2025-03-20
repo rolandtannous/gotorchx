@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/wangkuiyi/gotorch"
+	"github.com/rolandtannous/gotorchx"
 )
 
 func TestTensorGobEncode(t *testing.T) {

@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	torch "github.com/wangkuiyi/gotorch"
-	F "github.com/wangkuiyi/gotorch/nn/functional"
+	torch "github.com/rolandtannous/gotorchx"
+	F "github.com/rolandtannous/gotorchx/nn/functional"
 )
 
 type myModelModule struct {

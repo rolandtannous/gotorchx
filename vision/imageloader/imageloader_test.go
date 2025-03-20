@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	torch "github.com/wangkuiyi/gotorch"
-	tgz "github.com/wangkuiyi/gotorch/tool/tgz"
-	"github.com/wangkuiyi/gotorch/vision/transforms"
+	torch "github.com/rolandtannous/gotorchx"
+	tgz "github.com/rolandtannous/gotorchx/tool/tgz"
+	"github.com/rolandtannous/gotorchx/vision/transforms"
 )
 
 func synthesizeInvalidImageTgz(fn string) {
@@ -125,7 +125,7 @@ func TestImageTgzLoaderHeavy(t *testing.T) {
 	// NOTE: you can download a subset of ImageNet dataset which contains 1k images from https://gotorch-ci.oss-cn-hongkong.aliyuncs.com/imagenet_train_shuffle_1k.tgz
 	// and run `export GOTORCH_TEST_IMAGE_TGZ_PATH=/your/path/imagenet_train_shuffle_1k.tgz` to set the environment variable to run
 	// this unit test.
-	// If you want to generate a custom shuffled tarball, please go to https://github.com/wangkuiyi/gotorch/blob/develop/doc/shuffle_tarball.md
+	// If you want to generate a custom shuffled tarball, please go to https://github.com/rolandtannous/gotorchx/blob/develop/doc/shuffle_tarball.md
 	if os.Getenv("GOTORCH_TEST_IMAGE_TGZ_PATH") == "" {
 		t.Skip("No GOTORCH_TEST_IMAGE_TGZ_PATH from env, skip test")
 	}

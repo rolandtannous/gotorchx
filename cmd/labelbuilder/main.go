@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/wangkuiyi/gotorch/vision/imageloader"
+	"github.com/rolandtannous/gotorchx/vision/imageloader"
 )
 
 var data = flag.String("data", "", "path to dataset")

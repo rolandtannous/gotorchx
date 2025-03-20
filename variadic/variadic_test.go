@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/wangkuiyi/gotorch/variadic"
+	"github.com/rolandtannous/gotorchx/variadic"
 )
 
 func TestHas(t *testing.T) {
