@@ -94,7 +94,7 @@ We have a plan of a translator that migrates existing PyTorch models in Python i
 Updated Assessment of Gotorch Challenges in 2024
 
 Examining the key issues mentioned in the original abandonment of gotorch, here's how the situation has evolved:
-1. cgo Performance
+**1. CGO Performance**
 
 Original Issue: The project was initially abandoned partly due to cgo performance concerns, with the original author noting that Go's team wasn't prioritizing cgo performance improvements.
 
@@ -106,7 +106,8 @@ Original Issue: The project was initially abandoned partly due to cgo performanc
     The Go team has indeed improved cgo performance significantly despite earlier indications
 
 This performance level is now adequate for most ML workloads and no longer represents a significant bottleneck for projects like gotorch.
-2. GPU Memory Management
+
+**2. GPU Memory Management**
 
 Original Issue: Coordination between Go's garbage collector and GPU memory release was identified as a critical challenge, particularly for training workloads.
 
@@ -118,7 +119,8 @@ Original Issue: Coordination between Go's garbage collector and GPU memory relea
     No native mechanism exists for GPU memory coordination with Go's GC cycles
 
 This remains the most significant technical challenge for a project like gotorch, particularly for training workloads where timely GPU memory release is critical.
-3. GC Pauses and Inference Performance
+
+**3. GC Pauses and Inference Performance**
 
 Original Issue: Concerns were raised about Go's garbage collector causing irregular pauses that could impact online inference performance.
 
